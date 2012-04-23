@@ -39,7 +39,7 @@ class Attribute(object):
         return "<Attr %s: %s>" % (self.name, self.value)
 
 
-class ExactMatchAttribute(Attribute):
+class ExactMatch(Attribute):
     """Exact matching attribute, that provides a full (i.e. weight
     match) on the same value, and zero similarity otherwise."""
 
@@ -49,7 +49,12 @@ class ExactMatchAttribute(Attribute):
         else:
             return 0.0
 
-class ExactMatchNumericAdaptAttribute(ExactMatchAttribute):
+class LinearMatch(Attribute):
+    """Matches linearly on a numeric attribute value."""
+
+    scale = 1.0
+
+class NumericAdapt(Attribute):
     """Exact match, but allow numeric adaptation based on this
     attribute."""
 
@@ -64,14 +69,46 @@ class ExactMatchNumericAdaptAttribute(ExactMatchAttribute):
         the current value."""
         return float(other.value-self.value)/self.value
 
-# Maps attribute names to classes
-name_map = {'JourneyCode': Attribute,
-            'HolidayType': TypeAttribute,
-            'Price': LessIsPerfectAttribute,
-            'NumberOfPersons': ExactMatchNumericAdaptAttribute,
-            'Region': RegionAttribute,
-            'Transportation': TransportationAttribute,
-            'Duration': LinearMatchNumericAdaptAttribute,
-            'Season': SeasonAttribute,
-            'Accomodation': AccomodationAttribute,
-            'Hotel': ExactMatchAttribute}
+class LessIsPerfect(LinearMatch):
+    """A 'Less is perfect' match, which is a linear match except when
+    the other value is less than this one, in which case it is a
+    perfect match."""
+    #TODO: Which is self, which is other? Consistency! :)
+
+    def similarity(self,other):
+        if other.value < self.value:
+            return self.weight
+        return LinearMatch.similarity(self,other)
+
+
+
+# Classes for actual attributes (names match the attribute names)
+class JourneyCode(Attribute):
+    pass
+
+class HolidayType(Attribute):
+    pass
+
+class Price(LessIsPerfect):
+    pass
+
+class NumberOfPersons(ExactMatch, NumericAdapt):
+    pass
+
+class Region(Attribute):
+    pass
+
+class Transportation(Attribute):
+    pass
+
+class Duration(LinearMatch, NumericAdapt):
+    pass
+
+class Season(Attribute):
+    pass
+
+class Accomodation(Attribute):
+    pass
+
+class Hotel(ExactMatch):
+    pass
