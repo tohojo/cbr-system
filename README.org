@@ -4,4 +4,4 @@ semester 1 2012, University of Auckland.
 
 Written in Python, using the travel case base.
 
-See [[design-notes.org]] for further information on application design.
+See [[file:design-notes.org][design-notes.org]] for further information on application design.
