@@ -1,3 +1,7 @@
 * cbr-system
 An implementation of a CBR system for assignment one of COMPSCI767,
 semester 1 2012, University of Auckland.
+
+Written in Python, using the travel case base.
+
+See [[design-notes.org]] for further information on application design.

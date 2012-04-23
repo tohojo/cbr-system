@@ -1,0 +1,25 @@
+* Comparison functions
+** HolidayType
+Manual grouping
+** Price
+Distance - less is perfect
+** NumberOfPersons
+Only match exact number - adapt others
+** Region
+Geographical matching based on geopy.
+Combine with type of place?
+** Transportation
+Conditional comparison, i.e. substitute planes for other modes if the
+journey is sufficiently short?
+** Duration
+Linear matching + adaptation.
+** Season
+Match summer/winter/spring/autumn, unless month is adjacent.
+** Accommodation
+Linear distance, more is perfect.
+** Hotel
+If selected, only match on perfect match.
+* Adaptation of results
+Adapt price for number of persons and duration (semi)linearly.
+* Interface
+Console (readline-ish) interface.
