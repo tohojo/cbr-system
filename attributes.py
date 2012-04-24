@@ -54,6 +54,10 @@ class LinearMatch(Attribute):
 
     scale = 1.0
 
+    def similarity(self, other):
+        """Linear similarity metric - absolute numeric value scaled by self.scale."""
+        return abs(self.value-other.value)/self.scale
+
 class NumericAdapt(Attribute):
     """Exact match, but allow numeric adaptation based on this
     attribute."""
@@ -112,3 +116,5 @@ class Accomodation(Attribute):
 
 class Hotel(ExactMatch):
     pass
+
+
