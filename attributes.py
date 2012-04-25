@@ -48,7 +48,11 @@ class Attribute(object):
         if type(value) == type(self):
             self._value = value._value
         else:
-            self._value = value
+            self._set_value(value)
+
+    def _set_value(self, value):
+        "Setter for value - to be overridden in subclasses"
+        self._value = value
 
     _weight = 1.0
     @property
@@ -105,13 +109,7 @@ class ExactMatch(Attribute):
 class Numeric(Attribute):
     """Attribute with numeric values"""
 
-    @property
-    def value(self):
-        """Attribute value"""
-        return self._value
-
-    @value.setter
-    def value(self,value):
+    def _set_value(self,value):
         if type(value) == type(self):
             self._value = value._value
         else:
@@ -200,16 +198,8 @@ class attribute_names:
 
         _scale = 1.0
 
-        @property
-        def value(self):
-            return self._value
-
-        @value.setter
-        def value(self, value):
+        def _set_value(self, value):
             """Convert a location value into a place"""
-            if type(value) == type(self):
-                self._value = value._value
-                return
             self._value = Place(value)
 
         def similarity(self, other):
@@ -241,17 +231,8 @@ class attribute_names:
                                     ("|".join(map(str,_numbers_rev.keys()+_numbers_rev.values()))+")"))
         _scale = 4.0
 
-        @property
-        def value(self):
-            return self._value
-
-        @value.setter
-        def value(self, value):
+        def _set_value(self, value):
             """Convert a value of type 'TwoStars' into an integer"""
-            if type(value) == type(self):
-                self._value = value._value
-                return
-
             m = self._numbers_match.match(str(value))
             if m is None:
                 raise RuntimeError("Unrecognised value for %s: '%s'" % (self.name, value))
