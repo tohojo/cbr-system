@@ -193,8 +193,14 @@ class attribute_names:
         stars. Value is stored numerically internally, but printed
         nicely."""
 
+        # Dictionaries to turn numbers into words and back. Also
+        # specifies the valid values for this attribute.
         _numbers = {1:"One", 2:"Two", 3:"Three", 4:"Four",5:"Five",}
         _numbers_rev = dict([(j.lower(), i) for (i,j) in _numbers.items()])
+        # Compile a regular expression to match for numbers at the
+        # start of a string, either in numerical or letter form.
+        _numbers_match = re.compile("^\s*(?P<number>"+\
+                                    ("|".join(map(str,_numbers_rev.keys()+_numbers_rev.values()))+")"))
         _scale = 4.0
 
         @property
@@ -204,16 +210,18 @@ class attribute_names:
         @value.setter
         def value(self, value):
             """Convert a value of type 'TwoStars' into an integer"""
+            m = _numbers_match.match(str(value))
+            if m is None:
+                raise RuntimeError("Unrecognised value for %s: '%s'" % (self.name, value))
+            value = m.group("number")
             try:
-                self._value = int(value)
+                int_val = int(value)
+                self._value = int_val
             except ValueError:
-                value_number = value.lower().replace("stars", "").replace("star", "")
-                if not value_number in self._numbers_rev:
-                    raise RuntimeError("Unrecognised value for %s: '%s'" % (self.name, value))
-                self._value = self._numbers_rev[value_number]
+                self._value = self._numbers_rev[value]
 
         def __str__(self):
-            return "%sStars" % self._numbers[self.value]
+            return "%s stars" % self._numbers[self.value]
 
     class Hotel(ExactMatch):
         pass
