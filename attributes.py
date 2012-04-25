@@ -102,14 +102,13 @@ class NumericAdapt(Attribute):
 
     _adaptable = True
     def adapt_distance(self, other):
-        """Return the adaptation distance, which is a positive or
-        negative value in the range [0-1] signifying how large an
-        adaptation is required to turn this attribute value into the
-        other one.
+        """Return the adaptation distance, i.e. the ratio of the other
+        value to the current value. This allows several cumulative
+        adaptations to be combined by simple multiplication.
 
         Straight-forward numeric fraction of difference in relation to
         the current value."""
-        return float(other.value-self.value)/self.value
+        return float(other.value)/self.value
 
 class LessIsPerfect(LinearMatch):
     """A 'Less is perfect' match, which is a linear match except when
