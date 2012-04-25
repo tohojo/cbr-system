@@ -44,9 +44,14 @@ class Attribute(object):
     def value(self,value):
         return self._value
 
+    @property
+    def weight(self):
+        """Weight for this attribute"""
+        return self._weight
+
     def __init__(self, value=None, weight=1.0):
         self.value = value
-        self.weight = weight
+        self._weight = weight
 
     def similarity(self, other):
         """Similarity metric between 0 and the selected weight. By
