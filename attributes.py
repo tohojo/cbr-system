@@ -177,7 +177,7 @@ class attribute_names:
     class Season(Attribute):
         pass
 
-    class Accomodation(LinearMatch):
+    class Accommodation(LinearMatch):
         """Accomodation attribute. Does linear matching on number of
         stars. Value is stored numerically internally, but printed
         nicely."""
