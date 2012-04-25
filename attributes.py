@@ -1,5 +1,6 @@
 import re
 from place import Place
+from tree import Tree
 
 class Attribute(object):
     """Base Attribute class, providing an attribute with a name and a
@@ -174,6 +175,22 @@ class TableMatch(Attribute):
             raise RuntimeError("Other's value not found in match table: %s" % other.value)
         return self._match_table[self.value][other.value]
 
+class TreeMatch(Attribute):
+    """Tree matching, by finding the nearest common ancestor between two values."""
+
+    _match_tree = Tree(["root", 0.0, []])
+
+    def similarity(self, other):
+        if self.value == other.value:
+            return 1.0
+
+        return self._match_tree.find_common_value([self.value, other.value])
+
+    def _set_value(self, value):
+        if self._match_tree.find_path(value) is None:
+            raise RuntimeError("Unrecognised value for %s: %s" % (self.name, value))
+        self._value = value
+
 class attribute_names:
     """Namespace for classes corresponding to actual attribute names"""
 
@@ -181,7 +198,7 @@ class attribute_names:
         """JourneyCode attribute - standard attribute (not used in matching)"""
         _matching = False
 
-    class HolidayType(Attribute):
+    class HolidayType(TreeMatch):
         """HolidayType attribute - manual grouping of possible values in distance"""
 
     class Price(LessIsPerfect, LinearAdjust):
