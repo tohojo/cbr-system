@@ -1,4 +1,5 @@
 import re
+from place import Place
 
 class Attribute(object):
     """Base Attribute class, providing an attribute with a name and a
@@ -196,6 +197,23 @@ class attribute_names:
         """Region attribute. Does geographical matching, based on geopy,
         to get (estimated) coordinates of the region, and does similarity
         matching based on this."""
+
+        _scale = 1.0
+
+        @property
+        def value(self):
+            return self._value
+
+        @value.setter
+        def value(self, value):
+            """Convert a location value into a place"""
+            if type(value) == type(self):
+                self._value = value._value
+                return
+            self._value = Place(value)
+
+        def similarity(self, other):
+            return 1.0-self.value.distance(other.value)/self._scale
 
     class Transportation(TableMatch):
         """Transportation attribute. Does manual table based matching"""
