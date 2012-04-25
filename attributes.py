@@ -223,7 +223,8 @@ class attribute_names:
         """Duration of holiday. Match linearly, then adapt."""
 
     class Season(Attribute):
-        pass
+        """Season attribute"""
+
 
     class Accommodation(LinearMatch):
         """Accomodation attribute. Does linear matching on number of
@@ -251,7 +252,7 @@ class attribute_names:
                 self._value = value._value
                 return
 
-            m = _numbers_match.match(str(value))
+            m = self._numbers_match.match(str(value))
             if m is None:
                 raise RuntimeError("Unrecognised value for %s: '%s'" % (self.name, value))
             value = m.group("number")
