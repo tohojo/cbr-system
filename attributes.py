@@ -42,7 +42,10 @@ class Attribute(object):
 
     @value.setter
     def value(self,value):
-        return self._value
+        if type(value) == type(self):
+            self._value = value._value
+        else:
+            self._value = value
 
     @property
     def weight(self):
