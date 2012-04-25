@@ -89,11 +89,12 @@ class ExactMatch(Attribute):
 class LinearMatch(Attribute):
     """Matches linearly on a numeric attribute value."""
 
-    scale = 1.0
+    _scale = 1.0
 
     def similarity(self, other):
-        """Linear similarity metric - absolute numeric value scaled by self.scale."""
-        return abs(self.value-other.value)/self.scale
+        """Linear similarity metric - absolute value of numeric
+        difference, scaled by self._scale."""
+        return 1.0-abs(self.value-other.value)/self._scale
 
 class NumericAdapt(Attribute):
     """Exact match, but allow numeric adaptation based on this
