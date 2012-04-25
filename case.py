@@ -2,7 +2,9 @@
 from attributes import attribute_names
 
 class Case(object):
-    _attrs = {}
+
+    def __init__(self):
+        self._attrs = {}
 
     def __setattr__(self, name, value):
         """Overridden __setattr__ to turn attributes into attribute
