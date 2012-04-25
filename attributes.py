@@ -139,7 +139,7 @@ class TableMatch(Attribute):
             raise RuntimeError("Other's value not found in match table: %s" % other.value)
         return self._match_table[self.value][other.value]
 
-class AttributeNames:
+class attribute_names:
     """Namespace for classes corresponding to actual attribute names"""
 
     class JourneyCode(Attribute):
