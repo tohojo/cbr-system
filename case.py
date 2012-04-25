@@ -13,8 +13,8 @@ class Case(object):
 
         if name.startswith("_"):
             super(Case, self).__setattr__(name, value)
-        if name in self._attrs:
-            self._attrs[name] = value
+        elif name in self._attrs:
+            self._attrs[name].value = value
         else:
             if not hasattr(attribute_names, name):
                 raise KeyError("Unable to process attribute name: %s" % name)
