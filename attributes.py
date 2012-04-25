@@ -121,37 +121,81 @@ class LessIsPerfect(LinearMatch):
             return self.weight
         return LinearMatch.similarity(self,other)
 
+class TableMatch(Attribute):
+    """Table matching, by comparing values to a predefined table
+    (nested dictionaries) to get a similarity measure."""
 
+    _match_table = {}
 
-# Classes for actual attributes (names match the attribute names)
-class JourneyCode(Attribute):
-    pass
+    def similarity(self, other):
+        if not self.value in self._match_table:
+            raise RuntimeError("Own value not found in match table: %s" % self.value)
+        if not other.value in self._match_table[self.value]:
+            raise RuntimeError("Other's value not found in match table: %s" % other.value)
+        return self._match_table[self.value][other.value]
 
-class HolidayType(Attribute):
-    pass
+class AttributeNames:
+    """Namespace for classes corresponding to actual attribute names"""
 
-class Price(LessIsPerfect):
-    pass
+    class JourneyCode(Attribute):
+        """JourneyCode attribute - standard attribute (not used in matching)"""
+        _matching = False
 
-class NumberOfPersons(ExactMatch, NumericAdapt):
-    pass
+    class HolidayType(Attribute):
+        """HolidayType attribute - manual grouping of possible values in distance"""
 
-class Region(Attribute):
-    pass
+    class Price(LessIsPerfect):
+        """Price attribute - simple linear less is perfect matching.
+        Adjusted as a result of adaptation of other parameters."""
+        _adapt_adjust = True
 
-class Transportation(Attribute):
-    pass
+    class NumberOfPersons(LinearMatch, NumericAdapt):
+        """Number of persons. Match linearly, then adapt."""
+        _adaptable = True
 
-class Duration(LinearMatch, NumericAdapt):
-    pass
+    class Region(Attribute):
+        """Region attribute. Does geographical matching, based on geopy,
+        to get (estimated) coordinates of the region, and does similarity
+        matching based on this."""
 
-class Season(Attribute):
-    pass
+    class Transportation(TableMatch):
+        """Transportation attribute. Does manual table based matching"""
+        _match_table = {'plane': {'plane': 1.0, 'train': 0.0, 'car': 0.0,}}
 
-class Accomodation(Attribute):
-    pass
+    class Duration(LinearMatch, NumericAdapt):
+        pass
 
-class Hotel(ExactMatch):
-    pass
+    class Season(Attribute):
+        pass
+
+    class Accomodation(LinearMatch):
+        """Accomodation attribute. Does linear matching on number of
+        stars. Value is stored numerically internally, but printed
+        nicely."""
+
+        _numbers = {1:"one", 2:"two", 3:"three", 4:"four",5:"five",}
+        _numbers_rev = dict([reversed(i) for i in _numbers.items()])
+        _scale = 4.0
+
+        @property
+        def value(self):
+            return self._value
+
+        @value.setter
+        def value(self, value):
+            """Convert a value of type 'TwoStars' into an integer"""
+            try:
+                self._value = int(value)
+            except ValueError:
+                value_number = value.lower().replace("stars", "").replace("star", "")
+                if not value_number in self._numbers_rev:
+                    raise RuntimeError("Unrecognised value for %s: '%s'" % (self.name, value))
+                self._value = self._numbers_rev[value_number]
+
+        def __str__(self):
+            return "%sStars" % self._numbers[self.value]
+
+    class Hotel(ExactMatch):
+        pass
 
 
