@@ -100,7 +100,26 @@ class ExactMatch(Attribute):
         else:
             return 0.0
 
-class LinearMatch(Attribute):
+class Numeric(Attribute):
+    """Attribute with numeric values"""
+
+    @property
+    def value(self):
+        """Attribute value"""
+        return self._value
+
+    @value.setter
+    def value(self,value):
+        if type(value) == type(self):
+            self._value = value._value
+        else:
+            try:
+                self._value = int(value)
+            except ValueError:
+                raise RuntimeError("Unrecognised value for %s: %s" % (self.name, value))
+
+
+class LinearMatch(Numeric):
     """Matches linearly on a numeric attribute value."""
 
     _scale = 1.0
@@ -110,7 +129,7 @@ class LinearMatch(Attribute):
         difference, scaled by self._scale."""
         return 1.0-abs(self.value-other.value)/self._scale
 
-class NumericAdapt(Attribute):
+class NumericAdapt(Numeric):
     """Exact match, but allow numeric adaptation based on this
     attribute."""
 
@@ -158,7 +177,7 @@ class TableMatch(Attribute):
 class attribute_names:
     """Namespace for classes corresponding to actual attribute names"""
 
-    class JourneyCode(Attribute):
+    class JourneyCode(Numeric):
         """JourneyCode attribute - standard attribute (not used in matching)"""
         _matching = False
 
