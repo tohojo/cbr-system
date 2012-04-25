@@ -1,3 +1,4 @@
+import re
 
 class Attribute(object):
     """Base Attribute class, providing an attribute with a name and a
@@ -228,6 +229,10 @@ class attribute_names:
         @value.setter
         def value(self, value):
             """Convert a value of type 'TwoStars' into an integer"""
+            if type(value) == type(self):
+                self._value = value._value
+                return
+
             m = _numbers_match.match(str(value))
             if m is None:
                 raise RuntimeError("Unrecognised value for %s: '%s'" % (self.name, value))
@@ -242,6 +247,4 @@ class attribute_names:
             return "%s stars" % self._numbers[self.value]
 
     class Hotel(ExactMatch):
-        pass
-
-
+        """Hotel attribute. Only matches exact name of hotel."""
