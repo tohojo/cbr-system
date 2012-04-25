@@ -25,6 +25,10 @@ class Case(object):
             raise AttributeError("Attribute not found: %s" % name)
         return self._attrs[name]
 
+    def __repr__(self):
+        return "<Case: %s>" % (", ".join([repr(i) for i in self.all_attributes]))
+
+    @property
     def all_attributes(self):
         return self._attrs.values()
 
@@ -35,7 +39,7 @@ class Case(object):
 
         total_weight = 0.0
         total_similarity = 0.0
-        for attr in self.all_attributes():
+        for attr in self.all_attributes:
             if attr.matching:
                 try:
                     total_similarity += attr.similarity(getattr(other, attr.name))
