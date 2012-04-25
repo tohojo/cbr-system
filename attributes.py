@@ -178,8 +178,8 @@ class attribute_names:
         stars. Value is stored numerically internally, but printed
         nicely."""
 
-        _numbers = {1:"one", 2:"two", 3:"three", 4:"four",5:"five",}
-        _numbers_rev = dict([reversed(i) for i in _numbers.items()])
+        _numbers = {1:"One", 2:"Two", 3:"Three", 4:"Four",5:"Five",}
+        _numbers_rev = dict([(j.lower(), i) for (i,j) in _numbers.items()])
         _scale = 4.0
 
         @property
