@@ -37,7 +37,14 @@ class Place(object):
         self.place_name, self.coords = self._location_cache[key]
 
     def distance(self, other):
-        return distance.distance(self.coords, other.coords).km
+        """Distance between two places.
+
+        Distance is defined as the difference in *latitudes* between
+        the destinations. If distance is used, the points furthest
+        from each other are Tenerife and Egypt, even though it can be
+        argued that those two are quite similar for the purpose of
+        selecting a holiday."""
+        return abs(self.coords[0]-other.coords[0])
 
     def __repr__(self):
         return "<Place: %s>" % repr(self.place_name)
