@@ -1,4 +1,19 @@
+* Application design
+The main parts of the application are the Case and Attribute classes
+(and subclasses of the latter). The Case class defines an entire case,
+and how to match it to another case. Each attribute is represented by
+an appropriate Attribute subclass, which defines how to match values for
+this attribute to each other, whether or not to adapt attribute
+values, etc.
+
 * Comparison functions
+The subclasses of the Attribute class define how to match attributes
+to each other. Subclasses are defined for each type of matching (e.g.
+exact matching, less is perfect matching, etc), and for adaptation
+types (e.g. numerical adaptation). Classes are defined for the
+attribute names which inherit the corresponding matching classes,
+setting relevant parameters.
+
 ** HolidayType
 Manual grouping
 ** Price
