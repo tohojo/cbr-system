@@ -1,4 +1,3 @@
-
 from attributes import attribute_names
 
 class Case(object):
@@ -26,7 +25,7 @@ class Case(object):
         return self._attrs[name]
 
     def __repr__(self):
-        return "<Case: %s>" % (", ".join([repr(i) for i in self.all_attributes]))
+        return "<Case: %s>" % (", ".join(map(repr, self.all_attributes)))
 
     @property
     def all_attributes(self):
