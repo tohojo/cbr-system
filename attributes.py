@@ -11,13 +11,13 @@ class Attribute(object):
         case."""
         return self._adaptable
 
-    _adapt_adjust = False
+    _adjustable = False
     @property
-    def adapt_adjust(self):
+    def adjustable(self):
         """Whether or not this attribute should be adjusted from the
         resulting magnitude of the adaptation of other attributes
         (e.g. adjust price based on adjustment for number of persons)"""
-        return self._adapt_adjust
+        return self._adjustable
 
     _matching = True
     @property
@@ -73,6 +73,11 @@ class Attribute(object):
         other one."""
         raise NotImplementedError
 
+    def adjusted(self, value):
+        """Adjust this attribute by a percentage. Return new attribute
+        with the adjusted value."""
+        raise NotImplementedError
+
     def __eq__(self, other):
         """Equality is on all attributes"""
         return self.name == other.name and self.value == other.value and self.weight == other.weight
@@ -119,6 +124,13 @@ class NumericAdapt(Attribute):
         the current value."""
         return float(other.value)/self.value
 
+class LinearAdjust(Attribute):
+    """Linear numeric adjustment of value."""
+    _adjustable = True
+
+    def adjusted(self, value):
+        return self.__class__(self.value * value)
+
 class LessIsPerfect(LinearMatch):
     """A 'Less is perfect' match, which is a linear match except when
     the other value is less than this one, in which case it is a
@@ -153,10 +165,9 @@ class attribute_names:
     class HolidayType(Attribute):
         """HolidayType attribute - manual grouping of possible values in distance"""
 
-    class Price(LessIsPerfect):
+    class Price(LessIsPerfect, LinearAdjust):
         """Price attribute - simple linear less is perfect matching.
         Adjusted as a result of adaptation of other parameters."""
-        _adapt_adjust = True
 
     class NumberOfPersons(LinearMatch, NumericAdapt):
         """Number of persons. Match linearly, then adapt."""
