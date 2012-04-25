@@ -245,7 +245,7 @@ class attribute_names:
         _fuzz_similarity = 0.5
 
         def _set_value(self, value):
-            value_norm = value[0].upper() + value[1:].lower()
+            value_norm = value.capitalize()
             if not value_norm in self._months:
                 raise RuntimeError("Unrecognised value for %s: %s" % (self.name, value))
             self._value = value_norm
@@ -289,7 +289,7 @@ class attribute_names:
         # Compile a regular expression to match for numbers at the
         # start of a string, either in numerical or letter form.
         _numbers_match = re.compile("^\s*(?P<number>"+\
-                                    ("|".join(map(str,_numbers_rev.keys()+_numbers_rev.values()))+")"))
+                                    ("|".join(map(str,_numbers_rev.keys()+_numbers_rev.values()))+")"), re.I)
         _scale = 4.0
 
         def _set_value(self, value):
@@ -297,7 +297,7 @@ class attribute_names:
             m = self._numbers_match.match(str(value))
             if m is None:
                 raise RuntimeError("Unrecognised value for %s: '%s'" % (self.name, value))
-            value = m.group("number")
+            value = m.group("number").lower()
             try:
                 int_val = int(value)
                 self._value = int_val
