@@ -171,7 +171,6 @@ class attribute_names:
 
     class NumberOfPersons(LinearMatch, NumericAdapt):
         """Number of persons. Match linearly, then adapt."""
-        _adaptable = True
 
     class Region(Attribute):
         """Region attribute. Does geographical matching, based on geopy,
@@ -183,7 +182,7 @@ class attribute_names:
         _match_table = {'plane': {'plane': 1.0, 'train': 0.0, 'car': 0.0,}}
 
     class Duration(LinearMatch, NumericAdapt):
-        pass
+        """Duration of holiday. Match linearly, then adapt."""
 
     class Season(Attribute):
         pass
