@@ -215,6 +215,50 @@ class attribute_names:
     class Season(Attribute):
         """Season attribute"""
 
+        # Month names
+        _months = ["January", "February", "March", "April", "May", "June",
+                   "July", "August", "September", "October", "November", "December"]
+        # Seasons. Values are indexes in _months
+        _seasons = [[11,0,1], # Winter
+                    [2,3,4],  # Spring
+                    [5,6,7],  # Summer
+                    [8,9,10]] # Autumn
+
+        # Similarity for adjacent months / same season
+        _fuzz_similarity = 0.5
+
+        def _set_value(self, value):
+            value_norm = value[0].upper() + value[1:].lower()
+            if not value_norm in self._months:
+                raise RuntimeError("Unrecognised value for %s: %s" % (self.name, value))
+            self._value = value_norm
+
+        def similarity(self, other):
+            """Similarity metric for season. Perfect match if value is
+            the same. Otherwise, _fuzz_similarity if it's an adjacent month
+            or the same season"""
+            if self.value == other.value:
+                return 1.0
+
+            idx_self = self._months.index(self.value)
+            idx_other = self._months.index(other.value)
+            season_self = 0
+            season_other = 0
+            for i,season in zip(range(len(self._seasons)), self._seasons):
+                if idx_self in season:
+                    season_self = i
+                if idx_other in season:
+                    season_other = i
+
+            # Return the "fuzz similarity" if the two values are in
+            # the same season, or adjacent months. Wraparound on
+            # months is not a problem in this case, since that occurs
+            # within one season (winter)
+            if season_self == season_other or abs(idx_self-idx_other) == 1:
+                return self._fuzz_similarity
+
+            return 0.0
+
 
     class Accommodation(LinearMatch):
         """Accomodation attribute. Does linear matching on number of
