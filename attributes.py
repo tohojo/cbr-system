@@ -19,16 +19,17 @@ class Attribute(object):
         (e.g. adjust price based on adjustment for number of persons)"""
         return self._adapt_adjust
 
-    # Is this attribute used in matching cases to each other?
     _matching = True
     @property
     def matching(self):
         """Is this attribute used in matching cases to each other?"""
+        if hasattr(self, "_matching_set"):
+            return self._matching_set
         return self._matching
 
     @matching.setter
     def matching(self,value):
-        self._matching = value
+        self._matching_set = value
 
     @property
     def name(self):
