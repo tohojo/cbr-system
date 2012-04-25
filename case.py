@@ -49,3 +49,33 @@ class Case(object):
         if total_weight == 0.0:
             return 0.0
         return total_similarity / total_weight
+
+    def adapt(self, other):
+        """Adapt this case to fit other case.
+
+        This is done by combining all attribute adaptations and
+        applying this final adaptation to all attributes that are set
+        to be adjusted by adaptation.
+
+        Returns a final new case."""
+        total_adapt = 1.0
+        new_case = Case()
+
+        # First pass: Compute adaptation level from all adaptable
+        # attributes that exists in both case objects.
+        for attr in self.all_attributes:
+            if attr.adaptable and hasattr(other, attr.name):
+                total_adapt *= attr.adapt_distance(getattr(other, attr.name))
+
+        # Second pass: Copy all attributes into the new object; for
+        # adaptable attributes, use the values from other, for
+        # adjustable attributes, adjust them by the adapt value
+        for attr in self.all_attributes:
+            if attr.adaptable and hasattr(other, attr.name):
+                setattr(new_case, attr.name, getattr(other, attr.name))
+            elif attr.adjustable:
+                setattr(new_case, attr.name, attr.adjusted(total_adapt))
+            else:
+                setattr(new_case, attr.name, attr)
+
+        return new_case
