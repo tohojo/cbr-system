@@ -5,24 +5,57 @@ class Attribute(object):
     distance (which by default always matches)."""
 
     _adaptable = False
+    @property
+    def adaptable(self):
+        """Whether or not this attribute can be adapted to form a new
+        case."""
+        return self._adaptable
 
-    def __init__(self, name, value=None, weight=1.0):
-        self.name = name
+    _adapt_adjust = False
+    @property
+    def adapt_adjust(self):
+        """Whether or not this attribute should be adjusted from the
+        resulting magnitude of the adaptation of other attributes
+        (e.g. adjust price based on adjustment for number of persons)"""
+        return self._adapt_adjust
+
+    # Is this attribute used in matching cases to each other?
+    _matching = True
+    @property
+    def matching(self):
+        """Is this attribute used in matching cases to each other?"""
+        return self._matching
+
+    @matching.setter
+    def matching(self,value):
+        self._matching = value
+
+    @property
+    def name(self):
+        """Attribute name"""
+        return self.__class__.__name__
+
+    @property
+    def value(self):
+        """Attribute value"""
+        return self._value
+
+    @value.setter
+    def value(self,value):
+        return self._value
+
+    def __init__(self, value=None, weight=1.0):
         self.value = value
         self.weight = weight
 
     def similarity(self, other):
         """Similarity metric between 0 and the selected weight. By
         default attributes with the same name are always equal."""
-        #TODO: What happens when self.value==None / how to handle unselected attributes?
         if self.name == other.name:
             return self.weight
         else:
             return 0.0
 
-    @property
-    def adaptable(self):
-        return self._adaptable
 
     def adapt_distance(self, other):
         """Return the adaptation distance, which is a positive or
@@ -37,6 +70,10 @@ class Attribute(object):
 
     def __repr__(self):
         return "<Attr %s: %s>" % (self.name, self.value)
+
+    def __str__(self):
+        """The string representation of an attribute is its value by default"""
+        return self.value
 
 
 class ExactMatch(Attribute):
