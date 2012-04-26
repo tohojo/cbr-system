@@ -44,6 +44,8 @@ class Place(object):
         from each other are Tenerife and Egypt, even though it can be
         argued that those two are quite similar for the purpose of
         selecting a holiday."""
+        if self.coords is None or other.coords is None:
+            return 0.0
         return abs(self.coords[0]-other.coords[0])
 
     def __repr__(self):
