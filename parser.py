@@ -1,4 +1,10 @@
-import csv, re, pprint
+import csv, re, pprint, os
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
+
+
 from place import Place
 
 def parse(filename):
@@ -41,12 +47,6 @@ if __name__ == "__main__":
     min_people = max_people = int(items[0]['NumberOfPersons'])
     min_duration = max_duration = int(items[0]['Duration'])
 
-    from case import Case
-    c = Case()
-    for key,value in items[0].items():
-        c[key] = value
-    print c
-
     for item in items:
         price = int(item["Price"])
         people = int(item['NumberOfPersons'])
@@ -82,4 +82,28 @@ if __name__ == "__main__":
                     max_regions = [region,other_region]
     print "Distance: %f-%f, %f, %s" % (min_distance, max_distance, max_distance-min_distance, repr(max_regions))
 
+    filename = "cases.pickle"
+    if os.path.exists(filename):
+        print "Case storage file %s exists. Not creating cases." % filename
+    else:
+        print "Creating and storing Case objects in %s:" % filename
+        from case import Case
+        cases = []
+        for i,item in enumerate(items):
+            cases.append(Case(item))
+            if (i+1)%100 == 0:
+                print "  %d cases created..." % (i+1)
+        print "  Storing cases...",
+        with open(filename, "wb") as fp:
+            pickle.dump(cases, fp, -1)
+            print "done."
 
+    filename = "location_cache.pickle"
+    if os.path.exists(filename):
+        print "Location cache file %s exists. Not storing location cache." % filename
+    else:
+        print "Storing location cache in %s..." % filename,
+        import place
+        with open(filename, "wb") as fp:
+            pickle.dump(place.Place._location_cache, fp, -1)
+            print "done."
