@@ -49,7 +49,7 @@ class Interface(Console):
 
     def do_help(self, arg):
         if arg in ('status', 'query', 'result'):
-            super(Interface, self).do_help(arg)
+            Console.do_help(self, arg)
         else:
             print "\n".join(['These are the accepted commands.',
                              'Type help <command> to get help on a specific command.',
@@ -78,6 +78,14 @@ class Interface(Console):
         print self.gen_help("do_status")
 
     def do_query(self, arg):
+        """Manipulate the query.
+
+        query [show]             Show current query.
+        query reset              Reset query to be empty.
+        query set <key> <value>  Set query attribute <key> to <value>.
+        query unset <key>        Unset query attribute <key>.
+        query keys               List possible query keys.
+        query run                Run the current query."""
         if arg in ('', 'show'):
             if self.query:
                 print_table([self.query], ["Attribute", "Value"])
@@ -85,17 +93,53 @@ class Interface(Console):
                 print "No current query."
         elif arg == "reset":
             self.query = Case()
-            print "Query reset."
         elif arg.startswith('set'):
-            arg,key,val = arg.split()
-            self.query[key] = val
-            print "Set '%s' with value '%s' to query." % (key,val)
+            parts = arg.split(None, 2)
+            if len(parts) < 3:
+                print "Usage: query set <key> <value>."
+                return
+            arg,key,val = parts
+            try:
+                self.query[key] = val
+            except KeyError:
+                print "Invalid attribute name '%s'." % key
+                print "Possible attribute keys:"
+                print "\n".join(["  "+i for i in possible_attributes])
+            except ValueError, e:
+                print str(e)
         elif arg.startswith('unset'):
-            arg,key = arg.split()
+            parts = arg.split(None)
+            if len(parts) < 2:
+                print "Usage: query unset <key>."
+                return
+            arg,key = parts[:2]
+            if not key in self.query:
+                print "Attribute '%s' not found." % key
+                return
             del self.query[key]
-            print "Unset attribute '%s' from query." % key
+        elif arg.startswith('keys'):
+            print "Possible attribute keys:"
+            print "\n".join(["  "+i for i in possible_attributes])
         else:
             print "Unrecognised argument. Type 'help query' for help."
+
+    def help_query(self):
+        print self.gen_help("do_query")
+
+    def complete_query(self, text, line, begidx, endidx):
+        if re.match(r"\s*query\s+set", line):
+            args = possible_attributes
+        elif re.match(r"\s*query\s+unset", line):
+            args = self.query.keys()
+        elif re.match(r"\s*query\s+([^\s]+)?$", line):
+            args = ['show','reset','set','unset','keys','run']
+        else:
+            return []
+        if not text:
+            return args
+        else:
+            return [i for i in args if i.startswith(text)]
+
 
     def default(self, line):
         print "Invalid command. Type 'help' for a list of commands."
