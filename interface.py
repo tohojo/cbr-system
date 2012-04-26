@@ -27,7 +27,7 @@ from table_printer import print_table
 import attribute_names
 
 # Possible attribute names are all classes defined in the attribute_names module
-possible_attributes = sorted([i[0] for i in inspect.getmembers(attribute_names, inspect.isclass)])
+possible_attributes = dict(inspect.getmembers(attribute_names, inspect.isclass))
 
 class Interface(Console):
 
@@ -44,7 +44,10 @@ class Interface(Console):
 
     def gen_help(self, method):
         """Generate a help message by removing extra spaces from doc strings"""
-        helpstring = getattr(self.__class__, method).__doc__
+        if isinstance(basestring, method):
+            helpstring = getattr(self.__class__, method).__doc__
+        else:
+            helpstring = method.__doc__
         return re.sub("\n *", "\n", helpstring)
 
     def do_help(self, arg):
@@ -84,7 +87,7 @@ class Interface(Console):
         query reset              Reset query to be empty.
         query set <key> <value>  Set query attribute <key> to <value>.
         query unset <key>        Unset query attribute <key>.
-        query keys               List possible query keys.
+        query keys [key]         Help on possible keys.
         query run                Run the current query."""
         if arg in ('', 'show'):
             if self.query:
@@ -104,11 +107,11 @@ class Interface(Console):
             except KeyError:
                 print "Invalid attribute name '%s'." % key
                 print "Possible attribute keys:"
-                print "\n".join(["  "+i for i in possible_attributes])
+                print "\n".join(["  "+i for i in sorted(possible_attributes.keys())])
             except ValueError, e:
                 print str(e)
         elif arg.startswith('unset'):
-            parts = arg.split(None)
+            parts = arg.split()
             if len(parts) < 2:
                 print "Usage: query unset <key>."
                 return
@@ -118,8 +121,17 @@ class Interface(Console):
                 return
             del self.query[key]
         elif arg.startswith('keys'):
-            print "Possible attribute keys:"
-            print "\n".join(["  "+i for i in possible_attributes])
+            parts = arg.split()
+            if len(parts) < 2:
+                print "Possible attribute keys:"
+                print "\n".join(["  "+i for i in sorted(possible_attributes.keys())])
+                print "Run query keys <key> for help on a key."
+            else:
+                key = parts[1]
+                if not key in possible_attributes:
+                    print "Unrecognised attribute key: %s" % key
+                else:
+                    print self.gen_help(possible_attributes[key])
         else:
             print "Unrecognised argument. Type 'help query' for help."
 
@@ -127,8 +139,8 @@ class Interface(Console):
         print self.gen_help("do_query")
 
     def complete_query(self, text, line, begidx, endidx):
-        if re.match(r"\s*query\s+set", line):
-            args = possible_attributes
+        if re.match(r"\s*query\s+(set|keys)", line):
+            args = sorted(possible_attributes.keys())
         elif re.match(r"\s*query\s+unset", line):
             args = self.query.keys()
         elif re.match(r"\s*query\s+([^\s]+)?$", line):
