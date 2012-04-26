@@ -249,8 +249,8 @@ class attribute_names:
     class Transportation(TableMatch):
         """Transportation attribute. Does manual table based matching"""
         _match_table = {'Car':   {'Car': 1.0, 'Coach': 0.8, 'Plane': 0.4, 'Train': 0.5,},
-                        'Coach': {'Car': 0.8, 'Coach': 1.0, 'Plane': 0.4, 'Train': 0.7,}
-                        'Train': {'Car': 0.4, 'Coach': 0.8, 'Plane': 0.4, 'Train': 1.0,}
+                        'Coach': {'Car': 0.8, 'Coach': 1.0, 'Plane': 0.4, 'Train': 0.7,},
+                        'Train': {'Car': 0.4, 'Coach': 0.8, 'Plane': 0.4, 'Train': 1.0,},
                         'Plane': {'Car': 0.0, 'Coach': 0.0, 'Plane': 1.0, 'Train': 0.0,},}
 
         def _set_value(self, value):
@@ -294,7 +294,7 @@ class attribute_names:
             idx_other = self._months.index(other.value)
             season_self = 0
             season_other = 0
-            for i,season in zip(range(len(self._seasons)), self._seasons):
+            for i,season in enumerate(self._seasons):
                 if idx_self in season:
                     season_self = i
                 if idx_other in season:
