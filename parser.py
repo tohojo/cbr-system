@@ -41,6 +41,12 @@ if __name__ == "__main__":
     min_people = max_people = int(items[0]['NumberOfPersons'])
     min_duration = max_duration = int(items[0]['Duration'])
 
+    from case import Case
+    c = Case()
+    for key,value in items[0].items():
+        c[key] = value
+    print c
+
     for item in items:
         price = int(item["Price"])
         people = int(item['NumberOfPersons'])
