@@ -1,8 +1,67 @@
 import re
+from abc import ABCMeta, abstractmethod, abstractproperty
+
 from place import Place
 from tree import Tree
 
-class Attribute(object):
+class BaseAttribute(object):
+    __metaclass__ = ABCMeta
+    """Base class that Attribute inherits from. Specifies the
+    interface that Attribute classes must conform to. Attribute
+    contains default implementations of all interface methods."""
+    @abstractproperty
+    def adaptable(self):
+        """Whether or not this attribute can be adapted to form a new
+        case."""
+        return self._adaptable
+
+    @abstractproperty
+    def adjustable(self):
+        """Whether or not this attribute should be adjusted from the
+        resulting magnitude of the adaptation of other attributes
+        (e.g. adjust price based on adjustment for number of persons)"""
+        return self._adjustable
+
+    @abstractproperty
+    def matching(self):
+        """Is this attribute used in matching cases to each other?"""
+        return self._matching
+
+    @abstractproperty
+    def name(self):
+        """Attribute name"""
+        return self._name
+
+    @abstractproperty
+    def value(self):
+        """Attribute name"""
+        return self._value
+
+    @abstractproperty
+    def weight(self):
+        """Weight for this attribute"""
+        return self._weight
+
+    @abstractmethod
+    def similarity(self, other):
+        """Similarity metric between 0 and the selected weight."""
+        pass
+
+    @abstractmethod
+    def adapt_distance(self, other):
+        """Return the adaptation distance, which is a positive or
+        negative value in the range [0-1] signifying how large an
+        adaptation is required to turn this attribute value into the
+        other one."""
+        pass
+
+    @abstractmethod
+    def adjusted(self, other):
+        """Adjust this attribute by a percentage. Return new attribute
+        with the adjusted value."""
+        pass
+
+class Attribute(BaseAttribute):
     """Base Attribute class, providing an attribute with a name and a
     value, defining equality on these, and providing the similarity
     distance (which by default always matches)."""
