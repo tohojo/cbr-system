@@ -98,12 +98,12 @@ if __name__ == "__main__":
             pickle.dump(cases, fp, -1)
             print "done."
 
-    filename = "location_cache.pickle"
+    import place
+    filename = place.location_cache_filename
     if os.path.exists(filename):
         print "Location cache file %s exists. Not storing location cache." % filename
     else:
         print "Storing location cache in %s..." % filename,
-        import place
         with open(filename, "wb") as fp:
-            pickle.dump(place.Place._location_cache, fp, -1)
+            pickle.dump(place.location_cache, fp, -1)
             print "done."
