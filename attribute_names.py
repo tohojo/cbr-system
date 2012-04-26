@@ -73,7 +73,7 @@ class Region(attributes.Attribute):
         return 1.0-self.value.distance(other.value)/self._scale
 
     def __str__(self):
-        return self.value.name
+        return "%s (%s)" % (self.value.name, self.value.place_name)
 
 class Transportation(attributes.TableMatch):
     """Transportation attribute. Does manual table based matching"""
