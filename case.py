@@ -1,4 +1,5 @@
-from attributes import attribute_names, BaseAttribute
+from attributes import BaseAttribute
+import attribute_names
 
 class Case(dict):
     """Class to represent a case.
