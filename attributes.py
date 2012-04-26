@@ -195,7 +195,7 @@ class Numeric(Attribute):
             try:
                 self._value = int(value)
             except ValueError:
-                raise RuntimeError("Unrecognised value for %s: %s" % (self.name, value))
+                raise ValueError("Unrecognised value for %s: '%s'." % (self.name, value))
 
 
 class LinearMatch(Numeric):
@@ -266,6 +266,6 @@ class TreeMatch(Attribute):
 
     def _set_value(self, value):
         if self._match_tree.find_path(value) is None:
-            raise RuntimeError("Unrecognised value for %s: %s" % (self.name, value))
+            raise ValueError("Unrecognised value for %s: '%s'." % (self.name, value))
         self._value = value
 

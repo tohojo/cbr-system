@@ -109,7 +109,7 @@ class Season(attributes.Attribute):
     def _set_value(self, value):
         value_norm = value.capitalize()
         if not value_norm in self._months:
-            raise RuntimeError("Unrecognised value for %s: %s" % (self.name, value))
+            raise ValueError("Unrecognised value for %s: '%s'." % (self.name, value))
         self._value = value_norm
 
     def similarity(self, other):
@@ -163,7 +163,7 @@ class Accommodation(attributes.LinearMatch):
 
         m = self._numbers_match.match(str(value))
         if m is None:
-            raise RuntimeError("Unrecognised value for %s: '%s'" % (self.name, value))
+            raise ValueError("Unrecognised value for %s: '%s'." % (self.name, value))
         value = m.group("number").lower()
         try:
             int_val = int(value)
