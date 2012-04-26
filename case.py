@@ -11,6 +11,12 @@ class Case(dict):
     are defined, to respectively compare cases and adapt one case to
     another."""
 
+    def __init__(self, values={}, **kwargs):
+        """Constructor populates the case with the dictionary values
+        and/or the kwargs."""
+        for key,value in values.items() + kwargs.items():
+            self[key] = value
+
     def __setitem__(self, name, value):
         """Overridden __setitem__ to turn attributes into attribute
         classes before setting them (and raising an error if an
