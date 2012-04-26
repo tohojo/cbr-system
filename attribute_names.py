@@ -24,11 +24,21 @@ import re
 import attributes, tree, place
 
 class JourneyCode(attributes.Numeric):
-    """JourneyCode attribute - standard attribute (not used in matching)"""
+    """JourneyCode attribute (not used in matching).
+
+    Internal code for a given journey.
+
+    Possible values: positive integers."""
     _matching = False
 
 class HolidayType(attributes.TreeMatch):
-    """HolidayType attribute - manual grouping of possible values in distance"""
+    """HolidayType attribute.
+
+    Different types of holiday. Similarity is based on a similarity
+    tree for related types of holidays.
+
+    Possible values: Active, Bathing, City, Education, Language,
+    Recreation, Skiing, Wandering."""
 
     _match_tree = tree.Tree(["Holiday", 0.0, [
         ['Active', 1.0, []],
@@ -41,26 +51,46 @@ class HolidayType(attributes.TreeMatch):
         ['Wandering', 1.0, []],
         ]])
 
+    def _set_value(self, value):
+        attributes.TreeMatch._set_value(self, value.capitalize())
+
 class Price(attributes.LessIsPerfect, attributes.LinearAdjust):
-    """Price attribute - simple linear less is perfect matching.
-    Adjusted as a result of adaptation of other parameters."""
+    """Price of holiday.
+
+    Simple linear matching on price distance, with a less is perfect metric.
+
+    When a case is adapted, this value is adjusted corresponding to
+    the magnitude of adaptation of other parameters.
+
+    Possible values: Positive integers."""
 
     # Price range in test cases is from 279-7161
     _scale = 6882.0
+    _range = [279.0, 7161.0]
 
 class NumberOfPersons(attributes.LinearMatch, attributes.NumericAdapt):
-    """Number of persons. Match linearly, then adapt."""
+    """Number of persons for holiday.
+
+    Matching is linear in number of persons. This attribute can be
+    adapted to the desired queried value.
+
+    Possible values: Positive integers."""
 
     # Range in test cases is from 1-12
     _scale = 11.0
+    _range = [1.0, 12.0]
 
 class Region(attributes.Attribute):
-    """Region attribute. Does geographical matching, based on geopy,
-    to get (estimated) coordinates of the region, and does similarity
-    matching based on this."""
+    """Holiday region.
+
+    Attribute is looked up using Google Maps, and similarity is
+    latitudal distance based on this lookup.
+
+    Possible values: Any place name recognisable by Google Maps."""
 
     # Range for test cases is 0.001972-33.307608, or from Sweden to Egypt
     _scale = 33.305636
+    _range = [0.001972, 33.307608]
 
     def _set_value(self, value):
         """Convert a location value into a place"""
@@ -76,7 +106,10 @@ class Region(attributes.Attribute):
         return "%s (%s)" % (self.value.name, self.value.place_name)
 
 class Transportation(attributes.TableMatch):
-    """Transportation attribute. Does manual table based matching"""
+    """Type of transportation for a given holiday. Matching is
+    table-based between the possible values.
+
+    Possible values: Car, Coach, Train, Plane."""
     _match_table = {'Car':   {'Car': 1.0, 'Coach': 0.8, 'Plane': 0.4, 'Train': 0.5,},
                     'Coach': {'Car': 0.8, 'Coach': 1.0, 'Plane': 0.4, 'Train': 0.7,},
                     'Train': {'Car': 0.4, 'Coach': 0.8, 'Plane': 0.4, 'Train': 1.0,},
@@ -86,13 +119,26 @@ class Transportation(attributes.TableMatch):
         self._value = value.capitalize()
 
 class Duration(attributes.LinearMatch, attributes.NumericAdapt):
-    """Duration of holiday. Match linearly, then adapt."""
+    """Duration of holiday.
+
+    The duration of a holiday, in number of days. Similarity is
+    measured linearly in difference between durations. This attribute
+    can be adapted to the desired value queried.
+
+    Possible values: Positive integers."""
 
     # Range in test data is from 3-21
     _scale = 18.0
+    _range [3.0, 21.0]
 
 class Season(attributes.Attribute):
-    """Season attribute"""
+    """Holiday season.
+
+    Time holiday takes place. Matching is done by matching holidays
+    that are either in an adjacent month, or the same season (winter,
+    spring...) half, and others not at all.
+
+    Possible values: Month names (January...December)."""
 
     # Month names
     _months = ["January", "February", "March", "April", "May", "June",
@@ -140,13 +186,17 @@ class Season(attributes.Attribute):
 
 
 class Accommodation(attributes.LinearMatch):
-    """Accomodation attribute. Does linear matching on number of
-    stars. Value is stored numerically internally, but printed
-    nicely."""
+    """Type of accommodation for holiday.
+
+    Number of stars of hotel. A holiday flat is considered 0 stars.
+    Matching is linear on number of stars.
+
+    Possible values: Numerical value 0-5, or one of 'Holiday flat',
+    (One [star]...Five [stars])."""
 
     # Dictionaries to turn numbers into words and back. Also
     # specifies the valid values for this attribute.
-    _numbers = {1:"One", 2:"Two", 3:"Three", 4:"Four",5:"Five",}
+    _numbers = {0:"Holiday flat",1:"One", 2:"Two", 3:"Three", 4:"Four",5:"Five",}
     _numbers_rev = dict([(j.lower(), i) for (i,j) in _numbers.items()])
     # Compile a regular expression to match for numbers at the
     # start of a string, either in numerical or letter form.
@@ -177,4 +227,8 @@ class Accommodation(attributes.LinearMatch):
         return "%s stars" % self._numbers[self.value]
 
 class Hotel(attributes.ExactMatch):
-    """Hotel attribute. Only matches exact name of hotel."""
+    """Name of hotel.
+
+    Only matches exact name of hotel.
+
+    Possible values: Any string."""
