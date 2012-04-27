@@ -31,4 +31,5 @@ class Matcher(object):
         for case in self.cases:
             similarities.append((query.similarity(case), case))
         similarities.sort()
+        similarities.reverse()
         return similarities[:self.config['retrieve']]
