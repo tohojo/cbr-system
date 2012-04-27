@@ -40,6 +40,10 @@ def key_name(key):
         raise KeyError
 
 class Interface(Console):
+    _default_config = {"retrieve": 2,
+                       "adapt": True,
+                       "auto_run": False,
+                       "auto_display": False}
 
     def __init__(self, matcher):
         Console.__init__(self)
@@ -56,6 +60,7 @@ class Interface(Console):
             self.interactive = False
         else:
             self.interactive = True
+        self.config = self._default_config
 
 
     def gen_help(self, method):
@@ -121,6 +126,8 @@ class Interface(Console):
             arg,key,val = parts
             try:
                 self.query[key_name(key)] = val
+                if self.config['auto_run']:
+                    self.do_query("run")
             except KeyError:
                 print "Invalid attribute name '%s'." % key
                 print "Possible attribute keys:"
@@ -136,6 +143,8 @@ class Interface(Console):
             try:
                 key = key_name(key)
                 del self.query[key]
+                if self.config['auto_run']:
+                    self.do_query("run")
             except KeyError:
                 print "Attribute '%s' not found." % key
                 return
@@ -156,14 +165,19 @@ class Interface(Console):
                 print "No query to run."
                 return
             print "Running query...",
-            result = self.matcher.match(self.query)
+            result = self.matcher.match(self.query, self.config['retrieve'])
             if result:
-                if self.matcher.config['adapt'] and \
+                if self.config['adapt'] and \
                   result[0][0] < 1.0 and \
                   len([a for a in self.query.values() if a.adaptable]):
                     result.insert(0, ('adapted', result[0][1].adapt(self.query)))
                 self.result = (dict(self.query), result)
-                print "done. Use the 'result' command to view the result."
+                print "done.",
+                if self.config['auto_display']:
+                    print
+                    self.do_result("")
+                else:
+                    print " Use the 'result' command to view the result."
             else:
                 print "no result."
         else:
@@ -208,21 +222,31 @@ class Interface(Console):
         config set <key> <value>   Set <key> to <value>.
 
         Configuration keys:
-        retrieve:                  How many cases to retrieve when running queries.
-        adapt:                     Whether or not to adapt the best case if not a perfect match."""
+        adapt:                     Whether or not to adapt the best case if not a perfect match.
+        auto_display:              Automatically display results after running query.
+        auto_run:                  Automatically run query when it changes.
+        retrieve:                  How many cases to retrieve when running queries."""
         if args in ('', 'show'):
             print "Current config:"
-            print_table([self.matcher.config], ['Key', 'Value'])
+            print_table([self.config], ['Key', 'Value'])
         elif args.startswith('set'):
             parts = args.split(None, 2)
             if len(parts) < 3:
                 print "Usage: config set <key> <value>."
                 return
             key,value = parts[1:3]
-            if not key in self.matcher.config:
+            if not key in self.config:
                 print "Unrecognised config key: '%s'" % key
             try:
-                self.matcher.config[key] = type(self.matcher.config[key])(value)
+                if type(self.config[key]) in (int, float):
+                    self.config[key] = type(self.config[key])(value)
+                elif type(self.config[key]) == bool:
+                    if value.lower().strip() in ("1", "t", "y", "yes", "true"):
+                        self.config[key] = True
+                    elif value.lower().strip() in ("0", "f", "n", "no", "false"):
+                        self.config[key] = False
+                    else:
+                        raise ValueError
             except ValueError:
                 print "Invalid type for key %s: '%s'" % (key,value)
         else:
@@ -234,7 +258,7 @@ class Interface(Console):
 
     def complete_config(self, text, line, begidx, endidx):
         return self.completions(text, line, {'show': [],
-                                             'set': self.matcher.config.keys()})
+                                             'set': self.config.keys()})
 
     def completions(self, text, line, completions):
         parts = line.split(None)

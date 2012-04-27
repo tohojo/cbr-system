@@ -20,17 +20,13 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 class Matcher(object):
-    _default_config = dict(retrieve=2,
-                           adapt=1)
-
     def __init__(self, cases=[]):
         self.cases = cases
-        self.config = dict(self._default_config)
 
-    def match(self, query):
+    def match(self, query, count):
         similarities = []
         for case in self.cases:
             similarities.append((query.similarity(case), case))
         similarities.sort()
         similarities.reverse()
-        return similarities[:self.config['retrieve']]
+        return similarities[:count]
