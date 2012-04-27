@@ -19,6 +19,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+__all__ = ['Interface']
+
 import re, inspect, sys, cmd
 
 from console import Console
@@ -28,6 +30,14 @@ import attribute_names
 
 # Possible attribute names are all classes defined in the attribute_names module
 possible_attributes = dict(inspect.getmembers(attribute_names, inspect.isclass))
+
+def key_name(key):
+    try:
+        keys = possible_attributes.keys()
+        idx = [i.lower() for i in keys].index(key.lower())
+        return keys[idx]
+    except ValueError:
+        raise KeyError
 
 class Interface(Console):
 
@@ -109,9 +119,8 @@ class Interface(Console):
                 print "Usage: query set <key> <value>."
                 return
             arg,key,val = parts
-            key = key.capitalize()
             try:
-                self.query[key] = val
+                self.query[key_name(key)] = val
             except KeyError:
                 print "Invalid attribute name '%s'." % key
                 print "Possible attribute keys:"
@@ -124,11 +133,12 @@ class Interface(Console):
                 print "Usage: query unset <key>."
                 return
             arg,key = parts[:2]
-            key = key.capitalize()
-            if not key in self.query:
+            try:
+                key = key_name(key)
+                del self.query[key]
+            except KeyError:
                 print "Attribute '%s' not found." % key
                 return
-            del self.query[key]
         elif arg.startswith('keys'):
             parts = arg.split()
             if len(parts) < 2:
@@ -136,11 +146,11 @@ class Interface(Console):
                 print "\n".join(["  "+i for i in sorted(possible_attributes.keys())])
                 print "Run query keys <key> for help on a key."
             else:
-                key = parts[1].capitalize()
-                if not key in possible_attributes:
-                    print "Unrecognised attribute key: %s" % key
-                else:
+                try:
+                    key = key_name(key)
                     print self.gen_help(possible_attributes[key])
+                except KeyError:
+                    print "Unrecognised attribute key: %s" % key
         elif arg.startswith('run'):
             if not self.query:
                 print "No query to run."
@@ -191,7 +201,7 @@ class Interface(Console):
         if not text:
             return current
         else:
-            return [i+" " for i in current if i.lower().startswith(text)]
+            return [i+" " for i in current if i.lower().startswith(text.lower())]
 
     def completenames(self, text, line, begidx, endidx):
         completions = ['help', 'query', 'status', 'result', 'config', 'exit']
