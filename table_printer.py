@@ -22,7 +22,7 @@
 import re
 
 def longest_value(values):
-    return max(map(len, map(str, values)))
+    return max(map(len, map(unicode, values)))
 
 def aligned(value, length, align='left'):
     if align == 'left':
