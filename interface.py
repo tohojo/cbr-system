@@ -134,7 +134,7 @@ class Interface(Console):
                 return
             arg,key = parts[:2]
             try:
-                key = key_name(key)
+                key = key_name(key, possible_attributes)
                 del self.query[key]
                 if self.config['auto_run']:
                     self.do_query("run")
@@ -167,7 +167,6 @@ class Interface(Console):
                     adapt = False
                     for a in adaptable:
                         if self.query[a] != best[a]:
-                            print "'%s','%s'" % (type(self.query[a]), type(best[a]))
                             adapt = True
                     if adapt:
                         result.insert(0, ('adapted', best.adapt(self.query)))
