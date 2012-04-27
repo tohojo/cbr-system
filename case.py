@@ -97,7 +97,7 @@ class Case(dict):
         # Second pass: Copy all attributes into the new object; for
         # adaptable attributes, use the values from other, for
         # adjustable attributes, adjust them by the adapt value
-        for attr in self.all_attributes:
+        for attr in self.values():
             if attr.adaptable and attr.name in other:
                 new_case[attr.name] = other[attr.name]
             elif attr.adjustable:
