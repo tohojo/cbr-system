@@ -146,7 +146,7 @@ class Interface(Console):
                 print "No query to run."
                 return
             print "Running query...",
-            self.result = self.matcher.match(self.query)
+            self.result = (dict(self.query), self.matcher.match(self.query))
             if self.result:
                 print "done. Use the 'result' command to view the result."
             else:
@@ -170,9 +170,10 @@ class Interface(Console):
         if not self.result:
             print "No result."
             return
+        query,res = self.result
         header = ["Attribute", "Query"]
-        results = [self.query]
-        for i,(sim,res) in enumerate(self.result):
+        results = [query]
+        for i,(sim,res) in enumerate(res):
             header.append("Result %d (sim. %.3f)" % (i+1, sim))
             results.append(res)
         print_table(results,header)
