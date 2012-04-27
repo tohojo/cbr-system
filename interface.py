@@ -24,7 +24,6 @@ import re, inspect
 from console import Console
 from case import Case
 from table_printer import print_table
-from matcher import Matcher
 import attribute_names
 
 # Possible attribute names are all classes defined in the attribute_names module
@@ -32,12 +31,11 @@ possible_attributes = dict(inspect.getmembers(attribute_names, inspect.isclass))
 
 class Interface(Console):
 
-    def __init__(self, matcher=None):
+    def __init__(self, matcher):
         Console.__init__(self)
         self.prompt = ">> "
         self.intro = "Welcome to the CBR system. Type 'help' for a list of commands."
-        if not matcher:
-            self.matcher = Matcher()
+        self.matcher = matcher
         if not self.matcher.cases:
             self.intro += "\nNOTE: Currently no cases loaded (you may want to run parser.py to generate some)!"
 
@@ -173,5 +171,6 @@ class Interface(Console):
 
 
 if __name__ == "__main__":
-    interface = Interface()
+    from matcher import Matcher
+    interface = Interface(Matcher())
     interface.cmdloop()
