@@ -60,7 +60,8 @@ class Interface(Console):
                              'status    Show summary of system status.',
                              'query     Manipulate and run query.',
                              'result    Show result of a query.',
-                             'config    Set config variables.'])
+                             'config    Set config variables.',
+                             'exit      Exit program.'])
 
     def help_help(self):
         print self.gen_help("do_help"),
@@ -69,7 +70,7 @@ class Interface(Console):
         """Print current status of system (i.e. how many cases loaded etc)."""
         print "Currently %d cases loaded." % len(self.matcher.cases)
         if self.query:
-            print "Current query has %d properties." % len(self.query)
+            print "Current query has %d attributes." % len(self.query)
         else:
             print "No current query."
         if self.result:
