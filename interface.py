@@ -148,19 +148,25 @@ class Interface(Console):
         print self.gen_help("do_query")
 
     def complete_query(self, text, line, begidx, endidx):
-        if re.match(r"\s*query\s+(set|keys)", line):
-            args = sorted(possible_attributes.keys())
-        elif re.match(r"\s*query\s+unset", line):
-            args = self.query.keys()
-        elif re.match(r"\s*query\s+([^\s]+)?$", line):
-            args = ['show','reset','set','unset','keys','run']
-        else:
-            return []
-        if not text:
-            return args
-        else:
-            return [i for i in args if i.startswith(text)]
+        return self.completions(text, line, {'set': sorted(possible_attributes.keys()),
+                                                   'keys': sorted(possible_attributes.keys()),
+                                                   'unset': self.query.keys(),
+                                                   'show': [],
+                                                   'reset': [],
+                                                   'run': []})
 
+    def completions(self, text, line, completions):
+        #        print text,line
+        parts = line.split(None, 2)
+        current = []
+        if len(parts) == 1 or (len(parts) == 2 and not parts[1] in completions.keys()):
+            current = completions.keys()
+        elif len(parts) > 1 and parts[1] in completions:
+            current = completions[parts[1]]
+        if not text:
+            return current
+        else:
+            return [i for i in current if i.startswith(text)]
 
     def default(self, line):
         print "Invalid command. Type 'help' for a list of commands."
