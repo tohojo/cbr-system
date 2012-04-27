@@ -61,8 +61,12 @@ def print_table(dicts, header=None):
     print spacer
     if header:
         row = ""
-        for h,l in zip(header, [longest_key]+longest_values):
-            row += "| "+aligned(h,l)+" "
+        for i,h,l in zip(range(len(header)), header, [longest_key]+longest_values):
+            if i:
+                align = 'right'
+            else:
+                align = 'left'
+            row += "| "+aligned(h,l,align)+" "
         row +="|"
         print row
         print spacer
