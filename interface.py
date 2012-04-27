@@ -35,11 +35,12 @@ possible_attributes = dict(inspect.getmembers(attribute_names, inspect.isclass))
 class Interface(Console):
     _default_config = {"retrieve": 2,
                        "adapt": True,
-                       "auto_run": False,
-                       "auto_display": False}
+                       "auto_run": True,
+                       "auto_display": True}
 
     def __init__(self, matcher):
         Console.__init__(self)
+        self.config = self._default_config
         self.prompt = ">> "
         self.intro = "Welcome to the CBR system. Type 'help' for a list of commands."
         self.matcher = matcher
@@ -51,9 +52,10 @@ class Interface(Console):
         if not sys.stdin.isatty():
             self.prompt = self.intro = ""
             self.interactive = False
+            self.config['auto_run'] = False
+            self.config['auto_display'] = False
         else:
             self.interactive = True
-        self.config = self._default_config
 
 
     def gen_help(self, method):
