@@ -115,10 +115,10 @@ class Transportation(attributes.TableMatch):
     table-based between the possible values.
 
     Possible values: Car, Coach, Train, Plane."""
-    _match_table = {'Car':   {'Car': 1.0, 'Coach': 0.8, 'Plane': 0.4, 'Train': 0.5,},
-                    'Coach': {'Car': 0.8, 'Coach': 1.0, 'Plane': 0.4, 'Train': 0.7,},
-                    'Train': {'Car': 0.4, 'Coach': 0.8, 'Plane': 0.4, 'Train': 1.0,},
-                    'Plane': {'Car': 0.0, 'Coach': 0.0, 'Plane': 1.0, 'Train': 0.0,},}
+    _match_table = {'Car':   {'Car': 1.0, 'Coach': 0.8, 'Plane': 0.0, 'Train': 0.5,},
+                    'Coach': {'Car': 0.8, 'Coach': 1.0, 'Plane': 0.0, 'Train': 0.7,},
+                    'Plane': {'Car': 0.0, 'Coach': 0.0, 'Plane': 1.0, 'Train': 0.3,},
+                    'Train': {'Car': 0.4, 'Coach': 0.8, 'Plane': 0.0, 'Train': 1.0,},}
 
     def _set_value(self, value):
         self._value = value.capitalize()
