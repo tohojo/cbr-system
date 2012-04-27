@@ -156,8 +156,11 @@ class Interface(Console):
                 print "No query to run."
                 return
             print "Running query...",
-            self.result = (dict(self.query), self.matcher.match(self.query))
-            if self.result:
+            result = self.matcher.match(self.query)
+            if result:
+                if result[0][0] < 1.0 and len([a for a in self.query.values() if a.adaptable]):
+                    result.insert(0, ('adapted', result[0][1].adapt(self.query)))
+                self.result = (dict(self.query), result)
                 print "done. Use the 'result' command to view the result."
             else:
                 print "no result."
@@ -183,8 +186,13 @@ class Interface(Console):
         query,res = self.result
         header = ["Attribute", "Query"]
         results = [query]
+        add = 1
         for i,(sim,res) in enumerate(res):
-            header.append("Result %d (sim. %.3f)" % (i+1, sim))
+            if sim == 'adapted':
+                header.append("Adapted result")
+                add = 0
+            else:
+                header.append("Result %d (sim. %.3f)" % (i+add, sim))
             results.append(res)
         print_table(results,header)
 
