@@ -26,18 +26,11 @@ import re, inspect, sys, cmd
 from console import Console
 from case import Case
 from table_printer import print_table
+from util import key_name
 import attribute_names
 
 # Possible attribute names are all classes defined in the attribute_names module
 possible_attributes = dict(inspect.getmembers(attribute_names, inspect.isclass))
-
-def key_name(key):
-    try:
-        keys = possible_attributes.keys()
-        idx = [i.lower() for i in keys].index(key.lower())
-        return keys[idx]
-    except ValueError:
-        raise KeyError
 
 class Interface(Console):
     _default_config = {"retrieve": 2,
@@ -125,7 +118,7 @@ class Interface(Console):
                 return
             arg,key,val = parts
             try:
-                self.query[key_name(key)] = val
+                self.query[key_name(key, possible_attributes)] = val
                 if self.config['auto_run']:
                     self.do_query("run")
             except KeyError:

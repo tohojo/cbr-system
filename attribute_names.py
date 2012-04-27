@@ -120,9 +120,6 @@ class Transportation(attributes.TableMatch):
                     'Train': {'Car': 0.4, 'Coach': 0.8, 'Plane': 0.4, 'Train': 1.0,},
                     'Plane': {'Car': 0.0, 'Coach': 0.0, 'Plane': 1.0, 'Train': 0.0,},}
 
-    def _set_value(self, value):
-        self._value = value.capitalize()
-
 class Duration(attributes.LinearMatch, attributes.NumericAdapt):
     """Duration of holiday.
 

@@ -22,6 +22,7 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
 
 from tree import Tree
+from util import key_name
 
 class BaseAttribute(object):
     __metaclass__ = ABCMeta
@@ -280,6 +281,12 @@ class TableMatch(Attribute):
         if not other.value in self._match_table[self.value]:
             raise RuntimeError("Other's value not found in match table: %s" % other.value)
         return self._match_table[self.value][other.value]
+
+    def _set_value(self, value):
+        try:
+            self._value = key_name(value, self._match_table)
+        except KeyError:
+            raise ValueError("Unrecognised value for %s: '%s'." % (self.name, value))
 
 class TreeMatch(Attribute):
     """Tree matching, by finding the nearest common ancestor between two values."""
