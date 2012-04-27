@@ -24,6 +24,7 @@ import re, inspect
 from console import Console
 from case import Case
 from table_printer import print_table
+from matcher import Matcher
 import attribute_names
 
 # Possible attribute names are all classes defined in the attribute_names module
@@ -31,12 +32,13 @@ possible_attributes = dict(inspect.getmembers(attribute_names, inspect.isclass))
 
 class Interface(Console):
 
-    def __init__(self, cases=[]):
+    def __init__(self, matcher=None):
         Console.__init__(self)
         self.prompt = ">> "
         self.intro = "Welcome to the CBR system. Type 'help' for a list of commands."
-        self.cases = cases
-        if not cases:
+        if not matcher:
+            self.matcher = Matcher()
+        if not self.matcher.cases:
             self.intro += "\nNOTE: Currently no cases loaded (you may want to run parser.py to generate some)!"
 
         self.query = Case()
@@ -44,7 +46,7 @@ class Interface(Console):
 
     def gen_help(self, method):
         """Generate a help message by removing extra spaces from doc strings"""
-        if isinstance(basestring, method):
+        if isinstance(method, basestring):
             helpstring = getattr(self.__class__, method).__doc__
         else:
             helpstring = method.__doc__
@@ -67,7 +69,7 @@ class Interface(Console):
 
     def do_status(self, arg):
         """Print current status of system (i.e. how many cases loaded etc)."""
-        print "Currently %d cases loaded." % len(self.cases)
+        print "Currently %d cases loaded." % len(self.matcher.cases)
         if self.query:
             print "Current query has %d properties." % len(self.query)
         else:
@@ -132,6 +134,13 @@ class Interface(Console):
                     print "Unrecognised attribute key: %s" % key
                 else:
                     print self.gen_help(possible_attributes[key])
+        elif arg.startswith('run'):
+            if not self.query:
+                print "No query to run."
+                return
+            print "Running query...",
+            self.result = self.matcher.match(self.query)
+            print "done. Use the 'result' command to view the result."
         else:
             print "Unrecognised argument. Type 'help query' for help."
 
