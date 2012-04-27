@@ -104,7 +104,11 @@ class Region(attributes.Attribute):
         return 1.0-self.scale(self.value.distance(other.value), [self.value.coords[0], other.value.coords[0]])
 
     def __str__(self):
-        return "%s (%s)" % (self.value.name, self.value.place_name)
+        place_name = self.value.place_name
+
+        if len(place_name) > 25:
+            place_name = place_name[:10].strip() + "..." + place_name[-10:].strip()
+        return "%s (%s)" % (self.value.name, place_name)
 
 class Transportation(attributes.TableMatch):
     """Type of transportation for a given holiday. Matching is
