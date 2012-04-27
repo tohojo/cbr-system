@@ -75,7 +75,7 @@ class Interface(Console):
     def do_status(self, arg):
         """Print current status of system (i.e. how many cases loaded etc)."""
         print "Currently %d cases loaded." % len(self.matcher.cases)
-        if snelf.query:
+        if self.query:
             print "Current query has %d attributes." % len(self.query)
         else:
             print "No current query."
@@ -109,6 +109,7 @@ class Interface(Console):
                 print "Usage: query set <key> <value>."
                 return
             arg,key,val = parts
+            key = key.capitalize()
             try:
                 self.query[key] = val
             except KeyError:
@@ -123,6 +124,7 @@ class Interface(Console):
                 print "Usage: query unset <key>."
                 return
             arg,key = parts[:2]
+            key = key.capitalize()
             if not key in self.query:
                 print "Attribute '%s' not found." % key
                 return
@@ -134,7 +136,7 @@ class Interface(Console):
                 print "\n".join(["  "+i for i in sorted(possible_attributes.keys())])
                 print "Run query keys <key> for help on a key."
             else:
-                key = parts[1]
+                key = parts[1].capitalize()
                 if not key in possible_attributes:
                     print "Unrecognised attribute key: %s" % key
                 else:
@@ -170,9 +172,9 @@ class Interface(Console):
             return
         header = ["Attribute", "Query"]
         results = [self.query]
-        for i,(similarity,result) in enumerate(self.results):
-            header.append("Result %d (sim. %.3f)" % (i+1, similarity))
-            results.append(result)
+        for i,(sim,res) in enumerate(self.result):
+            header.append("Result %d (sim. %.3f)" % (i+1, sim))
+            results.append(res)
         print_table(results,header)
 
     def help_result(self):
@@ -188,7 +190,7 @@ class Interface(Console):
         if not text:
             return current
         else:
-            return [i+" " for i in current if i.startswith(text)]
+            return [i+" " for i in current if i.lower().startswith(text)]
 
     def completenames(self, text, line, begidx, endidx):
         completions = ['help', 'query', 'status', 'result', 'config', 'exit']
