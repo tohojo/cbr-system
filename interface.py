@@ -156,10 +156,6 @@ class Interface(Console):
                                                    'reset': [],
                                                    'run': []})
 
-    def completions(self, text, line, completions):
-        #        print text,line
-        parts = line.split(None, 2)
-        current = []
     def do_result(self, args):
         """Print the current query result."""
         if not self.result:
@@ -175,14 +171,24 @@ class Interface(Console):
     def help_result(self):
         print self.gen_help("do_result")
 
+    def completions(self, text, line, completions):
+        #        print text,line
+        parts = line.split(None)
+        current = []
         if len(parts) == 1 or (len(parts) == 2 and not parts[1] in completions.keys()):
             current = completions.keys()
-        elif len(parts) > 1 and parts[1] in completions:
+        elif ((len(parts) == 2 and not text) or (len(parts) == 3) and text) and parts[1] in completions:
             current = completions[parts[1]]
         if not text:
             return current
         else:
-            return [i for i in current if i.startswith(text)]
+            return [i+" " for i in current if i.startswith(text)]
+
+    def completenames(self, text, line, begidx, endidx):
+        completions = ['help', 'query', 'status', 'result', 'config', 'exit']
+        if text==line:
+            return [i+" " for i in completions if i.startswith(text)]
+        return Console.completenames(self, text, line, begidx, endidx)
 
     def default(self, line):
         print "Invalid command. Type 'help' for a list of commands."
