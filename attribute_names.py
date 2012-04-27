@@ -84,8 +84,16 @@ class NumberOfPersons(attributes.LinearMatch, attributes.NumericAdapt):
 class Region(attributes.Attribute):
     """Holiday region.
 
-    Attribute is looked up using Google Maps, and similarity is
-    latitudal distance based on this lookup.
+    Attribute is looked up using Google Maps, and similarity is based
+    on this lookup.
+
+    Distance is defined as the difference in *latitudes* between the
+    destinations. If distance is used, the points furthest from each
+    other are Tenerife and Egypt, even though it can be argued that
+    those two are quite similar for the purpose of selecting a
+    holiday. To distinguish regions that are close together on
+    latitude, the actual distance carries a 10% weight in distance
+    calculations.
 
     Possible values: Any place name recognisable by Google Maps (the
     lookup result is shown in parentheses when showing the
@@ -93,6 +101,7 @@ class Region(attributes.Attribute):
 
     # Range for test cases is 0.001972-33.307608, or from Sweden to Egypt
     _range = [0.001972, 33.307608]
+    _max_distance = 4646.845297
     _weight = 2.0
 
     def _set_value(self, value):
@@ -103,8 +112,11 @@ class Region(attributes.Attribute):
             self._value = place.Place(value)
 
     def similarity(self, other):
-        return self.weight*(1.0-self.scale(self.value.distance(other.value),
-                                           [self.value.coords[0], other.value.coords[0]]))
+        latitude_part = self.scale(self.value.latitudal_distance(other.value),
+                                   [self.value.coords[0], other.value.coords[0]])
+        distance = self.value.distance(other.value)
+        distance_part = distance/max([self._max_distance, distance])
+        return self.weight*(1.0-(latitude_part*0.9+distance_part*0.1))
 
     def __str__(self):
         place_name = self.value.place_name

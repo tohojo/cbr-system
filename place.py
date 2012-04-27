@@ -25,7 +25,7 @@ try:
 except ImportError:
     import pickle
 
-from geopy import geocoders
+from geopy import geocoders, distance
 
 geocoder = geocoders.Google(domain="maps.google.co.uk")
 location_cache_filename = "location_cache.pickle"
@@ -74,17 +74,14 @@ class Place(object):
                    location_cache[key] = (None,None)
         self.place_name, self.coords = location_cache[key]
 
-    def distance(self, other):
-        """Distance between two places.
-
-        Distance is defined as the difference in *latitudes* between
-        the destinations. If distance is used, the points furthest
-        from each other are Tenerife and Egypt, even though it can be
-        argued that those two are quite similar for the purpose of
-        selecting a holiday."""
+    def latitudal_distance(self, other):
+        """Latitudal distance between two places."""
         if self.coords is None or other.coords is None:
             return 0.0
         return abs(self.coords[0]-other.coords[0])
+
+    def distance(self, other):
+        return distance.distance(self.coords, other.coords).km
 
     def __repr__(self):
         return "<Place: %s>" % repr(self.place_name)
