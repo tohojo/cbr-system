@@ -167,10 +167,16 @@ class Interface(Console):
             print "Running query...",
             result = self.matcher.match(self.query, self.config['retrieve'])
             if result:
-                if self.config['adapt'] and \
-                  result[0][0] < 1.0 and \
-                  len([a for a in self.query.values() if a.adaptable]):
-                    result.insert(0, ('adapted', result[0][1].adapt(self.query)))
+                adaptable = [k for (k,v) in self.query.items() if v.adaptable]
+                best = result[0][1]
+                if self.config['adapt'] and adaptable:
+                    adapt = False
+                    for a in adaptable:
+                        if self.query[a] != best[a]:
+                            print "'%s','%s'" % (type(self.query[a]), type(best[a]))
+                            adapt = True
+                    if adapt:
+                        result.insert(0, ('adapted', best.adapt(self.query)))
                 self.result = (dict(self.query), result)
                 print "done.",
                 if self.config['auto_display']:
