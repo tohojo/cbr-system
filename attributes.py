@@ -187,6 +187,9 @@ class Attribute(BaseAttribute):
         """Equality is on all attributes"""
         return self.name == other.name and self.value == other.value and self.weight == other.weight
 
+    def __ne__(self,other):
+        return not self.__eq__(other)
+
     def __repr__(self):
         return "<Attr %s: %s>" % (self.name, self.value)
 
@@ -206,16 +209,21 @@ class ExactMatch(Attribute):
             return 0.0
 
 class Numeric(Attribute):
-    """Attribute with numeric values"""
+    """Attribute with positive numeric values."""
 
     def _set_value(self,value):
         if type(value) == type(self):
             self._value = value._value
         else:
             try:
-                self._value = int(value)
+                val = int(value)
             except ValueError:
                 raise ValueError("Unrecognised value for %s: '%s'." % (self.name, value))
+            else:
+                if val < 1:
+                    raise ValueError("Only positive values permitted.")
+                self._value = val
+
 
 
 class LinearMatch(Numeric):
