@@ -172,7 +172,7 @@ class Attribute(BaseAttribute):
 
     def __str__(self):
         """The string representation of an attribute is its value by default"""
-        return self.value
+        return str(self.value)
 
 
 class ExactMatch(Attribute):
