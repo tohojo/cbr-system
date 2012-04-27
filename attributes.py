@@ -22,6 +22,7 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
 
 from tree import Tree
+from util import key_name
 
 class BaseAttribute(object):
     __metaclass__ = ABCMeta
@@ -185,7 +186,13 @@ class Attribute(BaseAttribute):
 
     def __eq__(self, other):
         """Equality is on all attributes"""
-        return self.name == other.name and self.value == other.value and self.weight == other.weight
+        if isinstance(other, BaseAttribute):
+            return self.name == other.name and self.value == other.value and self.weight == other.weight
+        else:
+            return self.value == other
+
+    def __ne__(self,other):
+        return not self.__eq__(other)
 
     def __repr__(self):
         return "<Attr %s: %s>" % (self.name, self.value)
@@ -206,16 +213,21 @@ class ExactMatch(Attribute):
             return 0.0
 
 class Numeric(Attribute):
-    """Attribute with numeric values"""
+    """Attribute with positive numeric values."""
 
     def _set_value(self,value):
         if type(value) == type(self):
             self._value = value._value
         else:
             try:
-                self._value = int(value)
+                val = int(value)
             except ValueError:
                 raise ValueError("Unrecognised value for %s: '%s'." % (self.name, value))
+            else:
+                if val < 1:
+                    raise ValueError("Only positive values permitted.")
+                self._value = val
+
 
 
 class LinearMatch(Numeric):
@@ -226,7 +238,7 @@ class LinearMatch(Numeric):
     def similarity(self, other):
         """Linear similarity metric - absolute value of numeric
         difference, scaled by self.scale."""
-        return 1.0-self.scale(abs(self.value-other.value), [self.value, other.value])
+        return self.weight*(1.0-self.scale(abs(self.value-other.value), [self.value, other.value]))
 
 class NumericAdapt(Numeric):
     """Exact match, but allow numeric adaptation based on this
@@ -271,7 +283,13 @@ class TableMatch(Attribute):
             raise RuntimeError("Own value not found in match table: %s" % self.value)
         if not other.value in self._match_table[self.value]:
             raise RuntimeError("Other's value not found in match table: %s" % other.value)
-        return self._match_table[self.value][other.value]
+        return self._match_table[self.value][other.value] * self.weight
+
+    def _set_value(self, value):
+        try:
+            self._value = key_name(value, self._match_table)
+        except KeyError:
+            raise ValueError("Unrecognised value for %s: '%s'." % (self.name, value))
 
 class TreeMatch(Attribute):
     """Tree matching, by finding the nearest common ancestor between two values."""
@@ -280,9 +298,9 @@ class TreeMatch(Attribute):
 
     def similarity(self, other):
         if self.value == other.value:
-            return 1.0
+            return self.weight
 
-        return self._match_tree.find_common_value([self.value, other.value])
+        return self._match_tree.find_common_value([self.value, other.value]) * self.weight
 
     def _set_value(self, value):
         if self._match_tree.find_path(value) is None:

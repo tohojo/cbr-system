@@ -93,15 +93,20 @@ if __name__ == "__main__":
     max_distance = 0.0
     min_distance = 10000.0
     max_regions = []
+    max_direct_distance = 0.0
     for region in regions:
         for other_region in regions:
             if not region==other_region:
-                distance = region[1].distance(other_region[1])
+                distance = region[1].latitudal_distance(other_region[1])
                 min_distance = min([min_distance,distance])
+                direct_distance = region[1].distance(other_region[1])
+                if direct_distance > max_direct_distance:
+                    max_direct_distance = direct_distance
                 if distance > max_distance:
                     max_distance = distance
                     max_regions = [region,other_region]
-    print "Distance: %f-%f, %f, %s" % (min_distance, max_distance, max_distance-min_distance, repr(max_regions))
+    print "Latitudal distance: %f-%f, %f, %s" % (min_distance, max_distance, max_distance-min_distance, repr(max_regions))
+    print "Direct distance: max %f km" % max_direct_distance
 
     filename = "cases.pickle"
     if os.path.exists(filename):

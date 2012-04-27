@@ -1,6 +1,6 @@
 ## -*- coding: utf-8 -*-
 ##
-## matcher.py
+## util.py
 ##
 ## Author:   Toke Høiland-Jørgensen (toke@toke.dk)
 ## Date:     27 April 2012
@@ -19,14 +19,10 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-class Matcher(object):
-    def __init__(self, cases=[]):
-        self.cases = cases
-
-    def match(self, query, count):
-        similarities = []
-        for case in self.cases:
-            similarities.append((query.similarity(case), case))
-        similarities.sort()
-        similarities.reverse()
-        return similarities[:count]
+def key_name(key, dictionary):
+    try:
+        keys = dictionary.keys()
+        idx = [i.lower() for i in keys].index(key.lower())
+        return keys[idx]
+    except ValueError:
+        raise KeyError

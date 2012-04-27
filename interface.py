@@ -26,23 +26,21 @@ import re, inspect, sys, cmd
 from console import Console
 from case import Case
 from table_printer import print_table
+from util import key_name
 import attribute_names
 
 # Possible attribute names are all classes defined in the attribute_names module
 possible_attributes = dict(inspect.getmembers(attribute_names, inspect.isclass))
 
-def key_name(key):
-    try:
-        keys = possible_attributes.keys()
-        idx = [i.lower() for i in keys].index(key.lower())
-        return keys[idx]
-    except ValueError:
-        raise KeyError
-
 class Interface(Console):
+    _default_config = {"retrieve": 2,
+                       "adapt": True,
+                       "auto_run": True,
+                       "auto_display": True}
 
     def __init__(self, matcher):
         Console.__init__(self)
+        self.config = self._default_config
         self.prompt = ">> "
         self.intro = "Welcome to the CBR system. Type 'help' for a list of commands."
         self.matcher = matcher
@@ -54,6 +52,8 @@ class Interface(Console):
         if not sys.stdin.isatty():
             self.prompt = self.intro = ""
             self.interactive = False
+            self.config['auto_run'] = False
+            self.config['auto_display'] = False
         else:
             self.interactive = True
 
@@ -67,7 +67,7 @@ class Interface(Console):
         return re.sub("\n *", "\n", helpstring)
 
     def do_help(self, arg):
-        if arg in ('status', 'query', 'result'):
+        if arg in ('status', 'query', 'result', 'config', 'exit'):
             Console.do_help(self, arg)
         else:
             print "\n".join(['These are the accepted commands.',
@@ -120,7 +120,9 @@ class Interface(Console):
                 return
             arg,key,val = parts
             try:
-                self.query[key_name(key)] = val
+                self.query[key_name(key, possible_attributes)] = val
+                if self.config['auto_run']:
+                    self.do_query("run")
             except KeyError:
                 print "Invalid attribute name '%s'." % key
                 print "Possible attribute keys:"
@@ -134,8 +136,10 @@ class Interface(Console):
                 return
             arg,key = parts[:2]
             try:
-                key = key_name(key)
+                key = key_name(key, possible_attributes)
                 del self.query[key]
+                if self.config['auto_run']:
+                    self.do_query("run")
             except KeyError:
                 print "Attribute '%s' not found." % key
                 return
@@ -143,7 +147,8 @@ class Interface(Console):
             parts = arg.split()
             if len(parts) < 2:
                 print "Possible attribute keys:"
-                print "\n".join(["  "+i for i in sorted(possible_attributes.keys())])
+                print_table([dict([(k,v._weight) for (k,v) in possible_attributes.items()])],
+                            ["Attribute", "Weight"])
                 print "Run query keys <key> for help on a key."
             else:
                 try:
@@ -156,12 +161,24 @@ class Interface(Console):
                 print "No query to run."
                 return
             print "Running query...",
-            result = self.matcher.match(self.query)
+            result = self.matcher.match(self.query, self.config['retrieve'])
             if result:
-                if result[0][0] < 1.0 and len([a for a in self.query.values() if a.adaptable]):
-                    result.insert(0, ('adapted', result[0][1].adapt(self.query)))
+                adaptable = [k for (k,v) in self.query.items() if v.adaptable]
+                best = result[0][1]
+                if self.config['adapt'] and adaptable:
+                    adapt = False
+                    for a in adaptable:
+                        if self.query[a] != best[a]:
+                            adapt = True
+                    if adapt:
+                        result.insert(0, ('adapted', best.adapt(self.query)))
                 self.result = (dict(self.query), result)
-                print "done. Use the 'result' command to view the result."
+                print "done.",
+                if self.config['auto_display']:
+                    print
+                    self.do_result("")
+                else:
+                    print " Use the 'result' command to view the result."
             else:
                 print "no result."
         else:
@@ -199,6 +216,51 @@ class Interface(Console):
     def help_result(self):
         print self.gen_help("do_result")
 
+    def do_config(self, args):
+        """View or set configuration variables.
+
+        config [show]              Show current config.
+        config set <key> <value>   Set <key> to <value>.
+
+        Configuration keys:
+        adapt:                     Whether or not to adapt the best case if not a perfect match.
+        auto_display:              Automatically display results after running query.
+        auto_run:                  Automatically run query when it changes.
+        retrieve:                  How many cases to retrieve when running queries."""
+        if args in ('', 'show'):
+            print "Current config:"
+            print_table([self.config], ['Key', 'Value'])
+        elif args.startswith('set'):
+            parts = args.split(None, 2)
+            if len(parts) < 3:
+                print "Usage: config set <key> <value>."
+                return
+            key,value = parts[1:3]
+            if not key in self.config:
+                print "Unrecognised config key: '%s'" % key
+            try:
+                if type(self.config[key]) in (int, float):
+                    self.config[key] = type(self.config[key])(value)
+                elif type(self.config[key]) == bool:
+                    if value.lower().strip() in ("1", "t", "y", "yes", "true"):
+                        self.config[key] = True
+                    elif value.lower().strip() in ("0", "f", "n", "no", "false"):
+                        self.config[key] = False
+                    else:
+                        raise ValueError
+            except ValueError:
+                print "Invalid type for key %s: '%s'" % (key,value)
+        else:
+            print "Unrecognised argument."
+            self.help_config()
+
+    def help_config(self):
+        print self.gen_help('do_config')
+
+    def complete_config(self, text, line, begidx, endidx):
+        return self.completions(text, line, {'show': [],
+                                             'set': self.config.keys()})
+
     def completions(self, text, line, completions):
         parts = line.split(None)
         current = []
@@ -206,10 +268,7 @@ class Interface(Console):
             current = completions.keys()
         elif ((len(parts) == 2 and not text) or (len(parts) == 3) and text) and parts[1] in completions:
             current = completions[parts[1]]
-        if not text:
-            return current
-        else:
-            return [i+" " for i in current if i.lower().startswith(text.lower())]
+        return [i+" " for i in current if i.lower().startswith(text.lower())]
 
     def completenames(self, text, line, begidx, endidx):
         completions = ['help', 'query', 'status', 'result', 'config', 'exit']
