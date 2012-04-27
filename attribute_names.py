@@ -37,19 +37,24 @@ class HolidayType(attributes.TreeMatch):
     Different types of holiday. Similarity is based on a similarity
     tree for related types of holidays.
 
-    Possible values: Active, Bathing, City, Education, Language,
-    Recreation, Skiing, Wandering."""
+    Possible values: Active, Adventure, Arbitrary, Bathing, City,
+    Diving, Education, Language, Recreation, Shopping, Skiing,
+    Surfing, Wandering."""
 
-    _match_tree = tree.Tree(["Holiday", 0.0, [
-        ['Active', 1.0, []],
-        ['Bathing', 1.0, []],
-        ['City', 1.0, []],
-        ['Education', 1.0, []],
-        ['Language', 1.0, []],
-        ['Recreation', 1.0, []],
-        ['Skiing', 1.0, []],
-        ['Wandering', 1.0, []],
-        ]])
+    _match_tree = tree.Tree(
+        ["Arbitrary", 0.3, [
+                ['Active', 0.5, [
+                        ['Adventure', 1.0, []],
+                        ['Diving', 1.0, []],
+                        ['Skiing', 1.0, []],
+                        ['Surfing', 1.0, []]]],
+                ['City', 0.5, [
+                        ['Shopping', 1.0, []]]],
+                ['Education', 0.5,  [
+                        ['Language', 1.0, []]]],
+                ['Recreation', 0.6, [
+                        ['Bathing', 1.0, []],
+                        ['Wandering', 1.0, []]]]]])
 
     _weight = 10.0
 
