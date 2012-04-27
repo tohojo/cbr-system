@@ -19,7 +19,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import re, inspect
+import re, inspect, sys, cmd
 
 from console import Console
 from case import Case
@@ -41,6 +41,12 @@ class Interface(Console):
 
         self.query = Case()
         self.result = []
+        if not sys.stdin.isatty():
+            self.prompt = self.intro = ""
+            self.interactive = False
+        else:
+            self.interactive = True
+
 
     def gen_help(self, method):
         """Generate a help message by removing extra spaces from doc strings"""
@@ -69,7 +75,7 @@ class Interface(Console):
     def do_status(self, arg):
         """Print current status of system (i.e. how many cases loaded etc)."""
         print "Currently %d cases loaded." % len(self.matcher.cases)
-        if self.query:
+        if snelf.query:
             print "Current query has %d attributes." % len(self.query)
         else:
             print "No current query."
@@ -173,7 +179,6 @@ class Interface(Console):
         print self.gen_help("do_result")
 
     def completions(self, text, line, completions):
-        #        print text,line
         parts = line.split(None)
         current = []
         if len(parts) == 1 or (len(parts) == 2 and not parts[1] in completions.keys()):
@@ -194,6 +199,10 @@ class Interface(Console):
     def default(self, line):
         print "Invalid command. Type 'help' for a list of commands."
 
+    def postloop(self):
+        cmd.Cmd.postloop(self)
+        if self.interactive:
+            print "Exiting..."
 
 if __name__ == "__main__":
     from matcher import Matcher
