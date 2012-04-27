@@ -129,7 +129,7 @@ class Duration(attributes.LinearMatch, attributes.NumericAdapt):
 
     # Range in test data is from 3-21
     _scale = 18.0
-    _range [3.0, 21.0]
+    _range = [3.0, 21.0]
 
 class Season(attributes.Attribute):
     """Holiday season.
