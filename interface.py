@@ -138,7 +138,10 @@ class Interface(Console):
                 return
             print "Running query...",
             self.result = self.matcher.match(self.query)
-            print "done. Use the 'result' command to view the result."
+            if self.result:
+                print "done. Use the 'result' command to view the result."
+            else:
+                print "no result."
         else:
             print "Unrecognised argument. Type 'help query' for help."
 
@@ -157,6 +160,21 @@ class Interface(Console):
         #        print text,line
         parts = line.split(None, 2)
         current = []
+    def do_result(self, args):
+        """Print the current query result."""
+        if not self.result:
+            print "No result."
+            return
+        header = ["Attribute", "Query"]
+        results = [self.query]
+        for i,(similarity,result) in enumerate(self.results):
+            header.append("Result %d (sim. %.3f)" % (i+1, similarity))
+            results.append(result)
+        print_table(results,header)
+
+    def help_result(self):
+        print self.gen_help("do_result")
+
         if len(parts) == 1 or (len(parts) == 2 and not parts[1] in completions.keys()):
             current = completions.keys()
         elif len(parts) > 1 and parts[1] in completions:
