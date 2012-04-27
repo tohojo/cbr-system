@@ -86,10 +86,11 @@ class Region(attributes.Attribute):
     Attribute is looked up using Google Maps, and similarity is
     latitudal distance based on this lookup.
 
-    Possible values: Any place name recognisable by Google Maps."""
+    Possible values: Any place name recognisable by Google Maps (the
+    lookup result is shown in parentheses when showing the
+    attribute)."""
 
     # Range for test cases is 0.001972-33.307608, or from Sweden to Egypt
-    _scale = 33.305636
     _range = [0.001972, 33.307608]
 
     def _set_value(self, value):
@@ -100,7 +101,7 @@ class Region(attributes.Attribute):
             self._value = place.Place(value)
 
     def similarity(self, other):
-        return 1.0-self.value.distance(other.value)/self._scale
+        return 1.0-self.scale(self.value.distance(other.value), [self.value.coords[0], other.value.coords[0]])
 
     def __str__(self):
         return "%s (%s)" % (self.value.name, self.value.place_name)

@@ -112,6 +112,26 @@ class Attribute(BaseAttribute):
     def matching(self,value):
         self._matching_set = value
 
+
+    def scale(self, value, input_vals=None):
+        """Scale for normalising similarity values.
+
+        Supports specifying a _scale attribute or a _range attribute,
+        from which the scale is then calculated.
+
+        If a range is specified, it is extended if the scaled
+        input_values are supplied and are outside the range."""
+        if hasattr(self, '_range'):
+            if input_vals:
+                min_val = min([self._range[0]] + input_vals)
+                max_val = max([self._range[1]] + input_vals)
+                return value/(max_val-min_val)
+            else:
+                return value/(range[1]-range[0])
+        if hasattr(self, '_scale'):
+            return value/self._scale
+        return value
+
     @property
     def name(self):
         """Attribute name"""
@@ -205,8 +225,8 @@ class LinearMatch(Numeric):
 
     def similarity(self, other):
         """Linear similarity metric - absolute value of numeric
-        difference, scaled by self._scale."""
-        return 1.0-abs(self.value-other.value)/self._scale
+        difference, scaled by self.scale."""
+        return 1.0-self.scale(abs(self.value-other.value), [self.value, other.value])
 
 class NumericAdapt(Numeric):
     """Exact match, but allow numeric adaptation based on this
