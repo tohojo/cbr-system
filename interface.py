@@ -67,7 +67,7 @@ class Interface(Console):
         return re.sub("\n *", "\n", helpstring)
 
     def do_help(self, arg):
-        if arg in ('status', 'query', 'result'):
+        if arg in ('status', 'query', 'result', 'config', 'exit'):
             Console.do_help(self, arg)
         else:
             print "\n".join(['These are the accepted commands.',
@@ -158,7 +158,9 @@ class Interface(Console):
             print "Running query...",
             result = self.matcher.match(self.query)
             if result:
-                if result[0][0] < 1.0 and len([a for a in self.query.values() if a.adaptable]):
+                if self.matcher.config['adapt'] and \
+                  result[0][0] < 1.0 and \
+                  len([a for a in self.query.values() if a.adaptable]):
                     result.insert(0, ('adapted', result[0][1].adapt(self.query)))
                 self.result = (dict(self.query), result)
                 print "done. Use the 'result' command to view the result."
@@ -199,6 +201,41 @@ class Interface(Console):
     def help_result(self):
         print self.gen_help("do_result")
 
+    def do_config(self, args):
+        """View or set configuration variables.
+
+        config [show]              Show current config.
+        config set <key> <value>   Set <key> to <value>.
+
+        Configuration keys:
+        retrieve:                  How many cases to retrieve when running queries.
+        adapt:                     Whether or not to adapt the best case if not a perfect match."""
+        if args in ('', 'show'):
+            print "Current config:"
+            print_table([self.matcher.config], ['Key', 'Value'])
+        elif args.startswith('set'):
+            parts = args.split(None, 2)
+            if len(parts) < 3:
+                print "Usage: config set <key> <value>."
+                return
+            key,value = parts[1:3]
+            if not key in self.matcher.config:
+                print "Unrecognised config key: '%s'" % key
+            try:
+                self.matcher.config[key] = type(self.matcher.config[key])(value)
+            except ValueError:
+                print "Invalid type for key %s: '%s'" % (key,value)
+        else:
+            print "Unrecognised argument."
+            self.help_config()
+
+    def help_config(self):
+        print self.gen_help('do_config')
+
+    def complete_config(self, text, line, begidx, endidx):
+        return self.completions(text, line, {'show': [],
+                                             'set': self.matcher.config.keys()})
+
     def completions(self, text, line, completions):
         parts = line.split(None)
         current = []
@@ -206,10 +243,7 @@ class Interface(Console):
             current = completions.keys()
         elif ((len(parts) == 2 and not text) or (len(parts) == 3) and text) and parts[1] in completions:
             current = completions[parts[1]]
-        if not text:
-            return current
-        else:
-            return [i+" " for i in current if i.lower().startswith(text.lower())]
+        return [i+" " for i in current if i.lower().startswith(text.lower())]
 
     def completenames(self, text, line, begidx, endidx):
         completions = ['help', 'query', 'status', 'result', 'config', 'exit']

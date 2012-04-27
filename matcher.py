@@ -20,7 +20,8 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 class Matcher(object):
-    _default_config = dict(retrieve=2)
+    _default_config = dict(retrieve=2,
+                           adapt=1)
 
     def __init__(self, cases=[]):
         self.cases = cases
