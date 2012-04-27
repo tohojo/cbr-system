@@ -145,7 +145,8 @@ class Interface(Console):
             parts = arg.split()
             if len(parts) < 2:
                 print "Possible attribute keys:"
-                print "\n".join(["  "+i for i in sorted(possible_attributes.keys())])
+                print_table([dict([(k,v._weight) for (k,v) in possible_attributes.items()])],
+                            ["Attribute", "Weight"])
                 print "Run query keys <key> for help on a key."
             else:
                 try:

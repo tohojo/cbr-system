@@ -186,7 +186,10 @@ class Attribute(BaseAttribute):
 
     def __eq__(self, other):
         """Equality is on all attributes"""
-        return self.name == other.name and self.value == other.value and self.weight == other.weight
+        if isinstance(other, BaseAttribute):
+            return self.name == other.name and self.value == other.value and self.weight == other.weight
+        else:
+            return self.value == other
 
     def __ne__(self,other):
         return not self.__eq__(other)
@@ -235,7 +238,7 @@ class LinearMatch(Numeric):
     def similarity(self, other):
         """Linear similarity metric - absolute value of numeric
         difference, scaled by self.scale."""
-        return 1.0-self.scale(abs(self.value-other.value), [self.value, other.value])
+        return self.weight*(1.0-self.scale(abs(self.value-other.value), [self.value, other.value]))
 
 class NumericAdapt(Numeric):
     """Exact match, but allow numeric adaptation based on this
@@ -280,7 +283,7 @@ class TableMatch(Attribute):
             raise RuntimeError("Own value not found in match table: %s" % self.value)
         if not other.value in self._match_table[self.value]:
             raise RuntimeError("Other's value not found in match table: %s" % other.value)
-        return self._match_table[self.value][other.value]
+        return self._match_table[self.value][other.value] * self.weight
 
     def _set_value(self, value):
         try:
@@ -295,9 +298,9 @@ class TreeMatch(Attribute):
 
     def similarity(self, other):
         if self.value == other.value:
-            return 1.0
+            return self.weight
 
-        return self._match_tree.find_common_value([self.value, other.value])
+        return self._match_tree.find_common_value([self.value, other.value]) * self.weight
 
     def _set_value(self, value):
         if self._match_tree.find_path(value) is None:
