@@ -102,12 +102,12 @@ class Interface(Console):
     def do_query(self, arg):
         """Manipulate the query.
 
-        query [show]             Show current query.
-        query reset              Reset query to be empty.
-        query set <key> <value>  Set query attribute <key> to <value>.
-        query unset <key>        Unset query attribute <key>.
-        query keys [key]         Help on possible keys.
-        query run                Run the current query.
+        query [show]                   Show current query.
+        query reset                    Reset query to be empty.
+        query set <attribute> <value>  Set query attribute <attribute> to <value>.
+        query unset <attribute>        Unset query attribute <attribute>.
+        query names [attribute]        Show possible attribute names.
+        query run                      Run the current query.
 
         By default, the query is automatically run when changed, and
         the result is automatically displayed when run. This behaviour
@@ -123,7 +123,7 @@ class Interface(Console):
         elif arg.startswith('set'):
             parts = arg.split(None, 2)
             if len(parts) < 3:
-                print "Usage: query set <key> <value>."
+                print "Usage: query set <attribute> <value>."
                 return
             arg,key,val = parts
             try:
@@ -132,14 +132,14 @@ class Interface(Console):
                     self.do_query("run")
             except KeyError:
                 print "Invalid attribute name '%s'." % key
-                print "Possible attribute keys:"
+                print "Possible attribute names:"
                 print "\n".join(["  "+i for i in sorted(possible_attributes.keys())])
             except ValueError, e:
                 print str(e)
         elif arg.startswith('unset'):
             parts = arg.split()
             if len(parts) < 2:
-                print "Usage: query unset <key>."
+                print "Usage: query unset <attribute>."
                 return
             arg,key = parts[:2]
             try:
@@ -150,19 +150,36 @@ class Interface(Console):
             except KeyError:
                 print "Attribute '%s' not found." % key
                 return
-        elif arg.startswith('keys'):
+        elif arg.startswith('names'):
             parts = arg.split()
             if len(parts) < 2:
-                print "Possible attribute keys:"
-                print_table([dict([(k,v._weight) for (k,v) in possible_attributes.items()])],
-                            ["Attribute", "Weight"])
-                print "Run query keys <key> for help on a key."
+                print "Possible attributes:"
+                print_table([dict([(k,v._weight) for (k,v) in possible_attributes.items()]),
+                             dict([(k,v._adaptable) for (k,v) in possible_attributes.items()]),
+                             dict([(k,v._adjustable) for (k,v) in possible_attributes.items()]),],
+                            ["Attribute name", "Weight", "Adaptable", "Adjusted"])
+                print "\n".join(("Weight is the weight of the attribute for case similarity.",
+                                 "",
+                                 "Adaptable specifies whether the attribute can be adapted to",
+                                 "the query value.",
+                                 "",
+                                 "Adjustable specifies whether the attribute is adjusted based",
+                                 "on the adaptable ones.",
+                                 "",
+                                 "Run 'query names <attribute>' for help on an attribute."))
+
             else:
                 try:
                     key = key_name(parts[1], possible_attributes)
-                    print self.gen_help(possible_attributes[key])
+                    attr = possible_attributes[key]
+                    print "\n".join(("Attribute :  %s" % key,
+                                     "Weight    :  %s" % attr._weight,
+                                     "Adaptable :  %s" % attr._adaptable,
+                                     "Adjusted  :  %s" % attr._adjustable,
+                                     ""))
+                    print self.gen_help(attr)
                 except KeyError:
-                    print "Unrecognised attribute key: %s" % parts[1]
+                    print "Unrecognised attribute name: %s" % parts[1]
         elif arg.startswith('run'):
             if not self.query:
                 print "No query to run."
@@ -192,7 +209,7 @@ class Interface(Console):
 
     def complete_query(self, text, line, begidx, endidx):
         return self.completions(text, line, {'set': sorted(possible_attributes.keys()),
-                                                   'keys': sorted(possible_attributes.keys()),
+                                                   'names': sorted(possible_attributes.keys()),
                                                    'unset': self.query.keys(),
                                                    'show': [],
                                                    'reset': [],
