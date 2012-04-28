@@ -107,7 +107,12 @@ class Interface(Console):
         query set <key> <value>  Set query attribute <key> to <value>.
         query unset <key>        Unset query attribute <key>.
         query keys [key]         Help on possible keys.
-        query run                Run the current query."""
+        query run                Run the current query.
+
+        By default, the query is automatically run when changed, and
+        the result is automatically displayed when run. This behaviour
+        can be changed by setting respectively the 'auto_run' and
+        'auto_display' config parameters."""
         if arg in ('', 'show'):
             if self.query:
                 print_table([self.query], ["Attribute", "Value"])
@@ -194,7 +199,31 @@ class Interface(Console):
                                                    'run': []})
 
     def do_result(self, args):
-        """Print the current query result."""
+        """Print the current query result.
+
+        Prints a table with the query result, each column
+        corresponding to a result. The query that is printed along
+        with the result.
+
+        If the verbose_results config parameter is set (default: off),
+        the similarities for each attribute is shown after the value
+        in the form (normalised/weighed).
+
+        If adaptation is turned on (which is the default; turn it off
+        with 'config set adapt 0'), an adapted version of the best
+        result is shown along with the results if adaptation is
+        possible. Adaptation is possible if any of the parameters of
+        the query are adaptable, and the query value differs from the
+        value of the best result.
+
+        No adaptation is done if the adapted result is worse (i.e. has
+        a lower similarity) than the best query match. This can happen
+        if the adjusted attribute is part of the query.
+
+        Note that the query shown in the result can differ from the
+        current one, if the query has been altered and not rerun (by
+        default, the query is re-run whenever it is altered, but this
+        can be changed with the 'auto_run' parameter."""
         if not self.result:
             print "No result."
             return
