@@ -147,10 +147,3 @@ if __name__ == "__main__":
         with open(filename, "wb") as fp:
             pickle.dump((ranges,cases), fp, -1)
             print "done."
-
-    import place
-    filename = place.location_cache_filename
-    print "Storing location cache in %s..." % filename,
-    with open(filename, "wb") as fp:
-        pickle.dump(place.location_cache, fp, -1)
-        print "done."

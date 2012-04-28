@@ -19,7 +19,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
+import os, atexit
 try:
     import cPickle as pickle
 except ImportError:
@@ -29,6 +29,14 @@ from geopy import geocoders, distance
 
 geocoder = geocoders.Google(domain="maps.google.co.uk")
 location_cache_filename = "location_cache.pickle"
+
+
+def save_location_cache(filename=location_cache_filename):
+    import place
+    with open(filename, "wb") as fp:
+        pickle.dump(place.location_cache, fp, -1)
+
+atexit.register(save_location_cache)
 
 location_cache = {}
 
