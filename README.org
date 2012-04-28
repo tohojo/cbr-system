@@ -15,19 +15,15 @@ as follows:
 
 System-wide:
 
-#+begin_src sh
-  sudo easy_install geopy
-#+end_src
+=sudo easy_install geopy=
 
 For current user:
 
-#+begin_src sh
-  easy_install --user geopy
-#+end_src
+=easy_install --user geopy=
 
 ** Running
-To run the application, simply run `./main.py` (on unix) or `python2
-main.py` (on any platform). The application runs as a command-line
+To run the application, simply run =./main.py= (on unix) or =python2
+main.py= (on any platform). The application runs as a command-line
 console, and uses the readline library (if available) to provide
 command line history and completion.
 
