@@ -47,7 +47,7 @@ class Matcher(object):
         # result is assumed to be the result of a call to match(), so
         # get the Case element of the best match (i.e. the first
         # element).
-        best = result[0][1]
+        sim,best = result[0]
 
         # The adaptable attributes are all those that are marked as
         # adapted, and that differ in value between the query and the
@@ -55,4 +55,7 @@ class Matcher(object):
         adaptable = [k for (k,v) in query.items() if v.adaptable and query[k] != best[k]]
         if not adaptable:
             raise AdaptationError("No adaptable values differ")
-        return ('adapted', best.adapt(query))
+        adapted = best.adapt(query)
+        if query.similarity(adapted) < sim:
+            raise AdaptationError("Adapted result is worse than best match")
+        return ('adapted', adapted)
