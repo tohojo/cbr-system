@@ -27,12 +27,15 @@ class Matcher(object):
         self.cases = cases
 
     def match(self, query, count):
-        similarities = []
-        for case in self.cases:
-            similarities.append((query.similarity(case), case))
-        similarities.sort()
-        similarities.reverse()
-        return similarities[:count]
+        """Match a query to the case base and the count best matches."""
+        # Construct a list of tuples (similarity, case) from all cases
+        # in the case base.
+        similarities = zip(map(query.similarity, self.cases), self.cases)
+
+        # Return the count first elements of the sorted list of
+        # similarities (sorted() sorts on the first element of the
+        # tuple).
+        return sorted(similarities, reverse=True)[:count]
 
     def adapt(self, query, result):
         """Adapt a result to a query, if possible.
