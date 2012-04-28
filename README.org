@@ -15,11 +15,15 @@ as follows:
 
 System-wide:
 
-`sudo easy_install geopy`
+#+begin_src sh
+  sudo easy_install geopy
+#+end_src
 
 For current user:
 
-`easy_install --user geopy`
+#+begin_src sh
+  easy_install --user geopy
+#+end_src
 
 ** Running
 To run the application, simply run `./main.py` (on unix) or `python2
@@ -27,12 +31,17 @@ main.py` (on any platform). The application runs as a command-line
 console, and uses the readline library (if available) to provide
 command line history and completion.
 
+The application usage is pretty much self-documenting. Simply type
+'help' to get a list of commands when inside the application, and
+proceed from there.
+
+*** Loading the case-base
 If found, the case-base is loaded from 'cases.pickle' in the current
 directory, which contains a parsed case-base. The case-base can be
 (re)parsed by running parser.py, which can parse either a .csv file,
-or a .cases file (from the travel case base). Examples of both files
-are provided with the application. The parsed case-base contains the
-cases from reise.cases.
+or a .cases file (from the travel case base) and writes the result to
+cases.pickle. Examples of both files are provided with the
+application. The parsed case-base contains the cases from reise.cases.
 
 *** Location search
 To provide similarity metrics, a location-based search (provided by
