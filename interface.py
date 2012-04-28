@@ -170,7 +170,7 @@ class Interface(Console):
                         result.insert(0, self.matcher.adapt(self.query, result))
                     except AdaptationError:
                         pass
-                self.result = (dict(self.query), result)
+                self.result = (Case(self.query), result)
                 print "done.",
                 if self.config['auto_display']:
                     print
@@ -204,7 +204,7 @@ class Interface(Console):
         add = 1
         for i,(sim,res) in enumerate(result):
             if sim == 'adapted':
-                header.append("Adapted result")
+                header.append("Adapted result (sim. %.3f)" % query.similarity(res))
                 add = 0
             else:
                 header.append("Result %d (sim. %.3f)" % (i+add, sim))
