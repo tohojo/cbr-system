@@ -29,13 +29,17 @@ except ImportError:
 
 from matcher import Matcher
 from interface import Interface
+import attribute_names
 
 case_filename = "cases.pickle"
 
 def main():
     if os.path.exists(case_filename):
         with open(case_filename, "rb") as fp:
-            cases = pickle.load(fp)
+            ranges,cases = pickle.load(fp)
+            for k,v in ranges.items():
+                atrcls = getattr(attribute_names, k)
+                atrcls._range = v
     else:
         print "Warning: No cases found (looking in '%s')." % case_filename
         cases = []
