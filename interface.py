@@ -27,6 +27,7 @@ from console import Console
 from case import Case
 from table_printer import print_table
 from util import key_name
+from matcher import AdaptationError
 import attribute_names
 
 # Possible attribute names are all classes defined in the attribute_names module
@@ -164,15 +165,11 @@ class Interface(Console):
             print "Running query...",
             result = self.matcher.match(self.query, self.config['retrieve'])
             if result:
-                adaptable = [k for (k,v) in self.query.items() if v.adaptable]
-                best = result[0][1]
-                if self.config['adapt'] and adaptable:
-                    adapt = False
-                    for a in adaptable:
-                        if self.query[a] != best[a]:
-                            adapt = True
-                    if adapt:
-                        result.insert(0, ('adapted', best.adapt(self.query)))
+                if self.config['adapt']:
+                    try:
+                        result.insert(0, self.matcher.adapt(self.query, result))
+                    except AdaptationError:
+                        pass
                 self.result = (dict(self.query), result)
                 print "done.",
                 if self.config['auto_display']:

@@ -19,6 +19,9 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+class AdaptationError(RuntimeError):
+    pass
+
 class Matcher(object):
     def __init__(self, cases=[]):
         self.cases = cases
@@ -30,3 +33,23 @@ class Matcher(object):
         similarities.sort()
         similarities.reverse()
         return similarities[:count]
+
+    def adapt(self, query, result):
+        """Adapt a result to a query, if possible.
+
+        The return value is a tuple ('adapted', case), to conform to
+        the format of the return values of match()."""
+        if not result:
+            raise AdaptationError("Cannot adapt from empty result")
+        # result is assumed to be the result of a call to match(), so
+        # get the Case element of the best match (i.e. the first
+        # element).
+        best = result[0][1]
+
+        # The adaptable attributes are all those that are marked as
+        # adapted, and that differ in value between the query and the
+        # case.
+        adaptable = [k for (k,v) in query.items() if v.adaptable and query[k] != best[k]]
+        if not adaptable:
+            raise AdaptationError("No adaptable values differ")
+        return ('adapted', best.adapt(query))
