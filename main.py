@@ -27,6 +27,20 @@ try:
 except ImportError:
     import pickle
 
+try:
+    import readline, atexit
+    history_filename = "cbr_command_history"
+
+    def save_history(path=history_filename):
+        import readline
+        readline.write_history_file(path)
+
+    if os.path.exists(history_filename):
+        readline.read_history_file(history_filename)
+    atexit.register(save_history)
+except ImportError:
+    pass
+
 from matcher import Matcher
 from interface import Interface
 import attribute_names
