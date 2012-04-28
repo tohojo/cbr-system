@@ -36,7 +36,8 @@ class Interface(Console):
     _default_config = {"retrieve": 2,
                        "adapt": True,
                        "auto_run": True,
-                       "auto_display": True}
+                       "auto_display": True,
+                       "verbose_results": False}
 
     def __init__(self, matcher):
         Console.__init__(self)
@@ -200,17 +201,29 @@ class Interface(Console):
         if not self.result:
             print "No result."
             return
-        query,res = self.result
+        query,result = self.result
         header = ["Attribute", "Query"]
         results = [query]
         add = 1
-        for i,(sim,res) in enumerate(res):
+        for i,(sim,res) in enumerate(result):
             if sim == 'adapted':
                 header.append("Adapted result")
                 add = 0
             else:
                 header.append("Result %d (sim. %.3f)" % (i+add, sim))
-            results.append(res)
+            if self.config['verbose_results']:
+                r = {}
+                for k,v in res.items():
+                    if k in query:
+                        s = query[k].similarity(v)
+                        w = query[k].weight
+                    else:
+                        s = 1.0
+                        w = 1.0
+                    r[k] = "%s (%.2f/%.2f)" % (v, s/w, s)
+                results.append(r)
+            else:
+                results.append(res)
         print_table(results,header)
 
     def help_result(self):
@@ -226,7 +239,8 @@ class Interface(Console):
         adapt:                     Whether or not to adapt the best case if not a perfect match.
         auto_display:              Automatically display results after running query.
         auto_run:                  Automatically run query when it changes.
-        retrieve:                  How many cases to retrieve when running queries."""
+        retrieve:                  How many cases to retrieve when running queries.
+        verbose_results:           Show similarities (normalised/weighed) for each attribute."""
         if args in ('', 'show'):
             print "Current config:"
             print_table([self.config], ['Key', 'Value'])
