@@ -152,10 +152,10 @@ class Interface(Console):
                 print "Run query keys <key> for help on a key."
             else:
                 try:
-                    key = key_name(key)
+                    key = key_name(parts[1], possible_attributes)
                     print self.gen_help(possible_attributes[key])
                 except KeyError:
-                    print "Unrecognised attribute key: %s" % key
+                    print "Unrecognised attribute key: %s" % parts[1]
         elif arg.startswith('run'):
             if not self.query:
                 print "No query to run."
