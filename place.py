@@ -70,7 +70,7 @@ class Place(object):
                 search_value = list(geocoder.geocode(key, exactly_one = False))
                 location_cache[key] = search_value[0]
             except:
-                   raise ValueError("Unable to find location: %s" % name)
+                   raise ValueError("Unable to find location: '%s'" % name)
                    location_cache[key] = (None,None)
         self.place_name, self.coords = location_cache[key]
 
