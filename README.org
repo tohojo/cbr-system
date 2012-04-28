@@ -9,16 +9,14 @@ See [[file:design-notes.org][design-notes.org]] for further information on appli
 ** Installation
 The application is tested and written using Python 2.7, but will
 probably work in 2.5 and 2.6 as well. Apart from the standard library,
-the application depends on the 'geopy' library (see
-http://code.google.com/p/geopy/). It can be installed by easy_install
+the application depends on the 'geopy' library [fn::see
+http://code.google.com/p/geopy/]. It can be installed by easy_install
 as follows:
 
 System-wide:
-
 =sudo easy_install geopy=
 
 For current user:
-
 =easy_install --user geopy=
 
 ** Running
