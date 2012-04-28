@@ -28,10 +28,14 @@ except ImportError:
 
 from place import Place
 
-def parse(filename):
+def parse_csv(filename):
     with open(filename, "rb") as fp:
         reader = csv.reader(fp, delimiter=",", quotechar='"')
         return parse_items(reader)
+
+def parse_cases(filename):
+    with open(filename, "r") as fp:
+        return parse_items([i.split(None, 1) for i in fp])
 
 def parse_items(lines):
     items = []
@@ -62,7 +66,16 @@ def parse_item(lines):
     return item
 
 if __name__ == "__main__":
-    items = parse("travel-cases.csv")
+    import sys
+    if len(sys.argv) < 2:
+        filename = "travel_cases.csv"
+    else:
+        filename = sys.argv[1]
+
+    if filename.endswith(".csv"):
+        items = parse_csv(filename)
+    else:
+        items = parse_cases(filename)
     print "Parsed %d items" % len(items)
     min_price = max_price = int(items[0]['Price'])
     min_people = max_people = int(items[0]['NumberOfPersons'])
