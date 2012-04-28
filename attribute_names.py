@@ -105,8 +105,8 @@ class Region(attributes.Attribute):
     attribute)."""
 
     # Range for test cases is 0.001972-33.307608, or from Sweden to Egypt
-    _range = [0.001972, 33.307608]
-    _max_distance = 4646.845297
+    # The third item is the max direct distance
+    _range = [0.001972, 33.307608, 4646.845297]
     _weight = 2.0
 
     def _set_value(self, value):
@@ -120,7 +120,7 @@ class Region(attributes.Attribute):
         latitude_part = self.scale(self.value.latitudal_distance(other.value),
                                    [self.value.coords[0], other.value.coords[0]])
         distance = self.value.distance(other.value)
-        distance_part = distance/max([self._max_distance, distance])
+        distance_part = distance/max([self._ranges[2], distance])
         return self.weight*(1.0-(latitude_part*0.9+distance_part*0.1))
 
     def __str__(self):
