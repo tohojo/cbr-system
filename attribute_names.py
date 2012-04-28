@@ -23,13 +23,13 @@ import re
 
 import attributes, tree, place
 
-class JourneyCode(attributes.Numeric):
-    """JourneyCode attribute (not used in matching).
+class JourneyCode(attributes.Numeric, attributes.ExactMatch):
+    """JourneyCode attribute.
 
-    Internal code for a given journey.
+    Internal code for a given journey. Matches only if exact.
 
     Possible values: positive integers."""
-    _matching = False
+    _weight = 100.0
 
 class HolidayType(attributes.TreeMatch):
     """HolidayType attribute.
