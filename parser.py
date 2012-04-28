@@ -68,9 +68,13 @@ def parse_item(lines):
             continue
         # The keys we need start with an uppercase letter
         if key[0].isupper():
+            # Strip formatting characters
             key = key.strip(" :")
-            value = re.sub(r"([A-Z])", r" \1", value)
             value = value.strip('" .,\n"')
+            # Break apart camel-cased values into words.
+            value = re.sub(r"(.)([A-Z])", r"\1 \2", value)
+            # Normalise spaces
+            value = re.sub(r"\s+", r" ", value)
             item[key] = value
     return item
 
