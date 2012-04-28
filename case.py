@@ -71,8 +71,10 @@ class Case(dict):
                 try:
                     total_similarity += attr.similarity(other[attr.name])
                     total_weight += attr.weight
-                except AttributeError:
-                    pass # happens if other does not have an attribute of this name
+                except KeyError:
+                    # Happens if other does not have an attribute of
+                    # this name. This is interpreted as a 0 match.
+                    total_weight += attr.weight
         if total_weight == 0.0:
             return 0.0
         return total_similarity / total_weight
