@@ -5,3 +5,45 @@ semester 1 2012, University of Auckland.
 Written in Python, using the travel case base.
 
 See [[file:design-notes.org][design-notes.org]] for further information on application design.
+
+** Installation
+The application is tested and written using Python 2.7, but will
+probably work in 2.5 and 2.6 as well. Apart from the standard library,
+the application depends on the 'geopy' library (see
+http://code.google.com/p/geopy/). It can be installed by easy_install
+as follows:
+
+System-wide:
+
+`sudo easy_install geopy`
+
+For current user:
+
+`easy_install --user geopy`
+
+** Running
+To run the application, simply run `./main.py` (on unix) or `python2
+main.py` (on any platform). The application runs as a command-line
+console, and uses the readline library (if available) to provide
+command line history and completion.
+
+If found, the case-base is loaded from 'cases.pickle' in the current
+directory, which contains a parsed case-base. The case-base can be
+(re)parsed by running parser.py, which can parse either a .csv file,
+or a .cases file (from the travel case base). Examples of both files
+are provided with the application. The parsed case-base contains the
+cases from reise.cases.
+
+*** Location search
+To provide similarity metrics, a location-based search (provided by
+the geopy library) is used. This searches maps.google.co.nz for the
+provided place-name (a correction table is provided to ensure useful
+matches for all locations in the travel case base), and uses the first
+match for the similarity metric.
+
+For this to work, an internet connection must be available. Looked up
+names are stored in a cache, saved between program runs. Provided with
+the application, is a cache containing all place names in the travel
+case base (clear this by removing location_cache.pickle). If no
+internet connection is available, lookup only works on already cached
+items.
