@@ -136,7 +136,7 @@ class Transportation(attributes.TableMatch):
 
     Possible values: Car, Coach, Train, Plane."""
     _match_table = {'Car':   {'Car': 1.0, 'Coach': 0.8, 'Plane': 0.0, 'Train': 0.5,},
-                    'Coach': {'Car': 0.8, 'Coach': 1.0, 'Plane': 0.0, 'Train': 0.7,},
+                    'Coach': {'Car': 0.6, 'Coach': 1.0, 'Plane': 0.0, 'Train': 0.8,},
                     'Plane': {'Car': 0.0, 'Coach': 0.0, 'Plane': 1.0, 'Train': 0.3,},
                     'Train': {'Car': 0.4, 'Coach': 0.8, 'Plane': 0.0, 'Train': 1.0,},}
 
