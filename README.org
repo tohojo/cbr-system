@@ -9,14 +9,12 @@ See ~design-notes.org~ for further information on application design.
 ** Installation
 The application is tested and written using Python 2.7, but will
 probably work in 2.5 and 2.6 as well. Apart from the standard library,
-the application depends on the [[http://code.google.com/p/geopy/][geopy library]]. It can be installed by
-easy_install as follows:
+the application depends on the [[http://code.google.com/p/geopy/][geopy library]], which can be installed
+by easy_install as follows:
 
-System-wide:
-=sudo easy_install geopy=
+System-wide: =sudo easy_install geopy=
 
-For current user:
-=easy_install --user geopy=
+For current user: =easy_install --user geopy=
 
 ** Running
 To run the application, simply run =./main.py= (on unix) or =python2
@@ -24,9 +22,35 @@ main.py= (on any platform). The application runs as a command-line
 console, and uses the readline library (if available) to provide
 command line history and completion.
 
-The application usage is pretty much self-documenting. Simply type
-'help' to get a list of commands when inside the application, and
-proceed from there.
+A typical workflow for using the application is to set query
+parameters using the ~query set~ command, which will (by default) also
+run a query against the case-base.
+
+The application strives to be self-documenting via the built-in help
+command. Simply type ~help~ when inside the application, to get a list
+of commands. The following is the output of the help command (>> is
+the application prompt):
+
+~>> help
+These are the accepted commands.
+Type help <command> to get help on a specific command.
+
+status    Show summary of system status.
+query     Manipulate and run query.
+result    Show result of a query.
+config    Set config variables.
+exit      Exit application.~
+
+*** Running in batch mode
+Commands can be run in batch-mode by piping multiple commands (one on
+each line) to the standard input of the application. When run in batch
+mode, automatic running of queries is turned off by default. Thus, an
+explicit command of ~query run~ is needed to run the query and show
+the results. This allows multiple query parameters to be set, while
+only printing the final result.
+
+If desired, the automatic behaviour can be turned on by the ~config~
+command.
 
 *** Loading the case-base
 If found, the case-base is loaded from 'cases.pickle' in the current
