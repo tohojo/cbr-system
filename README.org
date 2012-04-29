@@ -1,10 +1,11 @@
 * cbr-system
-An implementation of a CBR system for assignment one of COMPSCI767,
-semester 1 2012, University of Auckland.
+An implementation of a Case Based Reasoning (CBR) system for
+assignment one of COMPSCI767, semester 1 2012, University of Auckland.
 
-Written in Python, using the travel case base.
+Written in Python, using the [[http://www.cs.auckland.ac.nz/%257Eian/CBR/travel_case_base.zip][travel case base]].
 
 See ~design-notes.org~ for further information on application design.
+For more information on CBR see [[http://www.cs.auckland.ac.nz/~ian/CBR/][Ian Watson's page on CBR]].
 
 ** Installation
 The application is tested and written using Python 2.7, but will
