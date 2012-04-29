@@ -49,8 +49,8 @@ explicit command of ~query run~ is needed to run the query and show
 the results. This allows multiple query parameters to be set, while
 only printing the final result.
 
-If desired, the automatic behaviour can be turned on by the ~config~
-command.
+If desired, the automatic behaviour can be turned back on by the
+~config~ command.
 
 *** Loading the case-base
 If found, the case-base is loaded from 'cases.pickle' in the current
