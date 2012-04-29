@@ -10,12 +10,9 @@ For more information on CBR see [[http://www.cs.auckland.ac.nz/~ian/CBR/][Ian Wa
 ** Installation
 The application is tested and written using Python 2.7, but will
 probably work in 2.5 and 2.6 as well. Apart from the standard library,
-the application depends on the [[http://code.google.com/p/geopy/][geopy library]], which can be installed
-by easy_install as follows:
-
-System-wide: =sudo easy_install geopy=
-
-For current user: =easy_install --user geopy=
+the application depends on the [[http://code.google.com/p/geopy/][geopy library]]. See the project website
+for installation details (or just try issuing =sudo easy_install
+geopy=).
 
 ** Running
 To run the application, simply run =./main.py= (on unix) or =python2
