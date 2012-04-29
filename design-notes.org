@@ -39,9 +39,16 @@ Similarity metrics and weights are defined for each attribute of the
 travel case base. In order to define similarity metrics, a
 domain-specific interpretation of each attribute is necessary. This
 section explains this interpretation and the resulting similarity
-metrics and weights for each attribute.
+metrics and weights for each attribute. Similarity metrics are given
+in the range [0-1], and weights in the range [1-\inf[.
 
-*** Accommodation
+As a general note, because of the way matching works (i.e. absent
+values from a query are ignored), the mere fact of an attribute being
+present is evidence of a preference. I.e. some attributes (like
+journey code or hotel name) do not make sense to specify in a query
+unless there's a very strong preference of that exact value.
+
+**** Accommodation
 The Accommodation attribute defines the quality of the holiday
 accommodation. The possible values are either a holiday flat, or a one
 to five star hotel. To simplify things, a holiday flat is interpreted
@@ -51,24 +58,179 @@ Under the assumption that, all other things being equal, a better
 accommodation type would be preferred, a 'more is perfect' metric is
 used for the comparison.
 
-*** HolidayType
-Manual grouping
-*** Price
-Distance - less is perfect
-*** NumberOfPersons
-Only match exact number - adapt others
-*** Region
-Geographical matching based on geopy.
-Combine with type of place?
-*** Transportation
-Conditional comparison, i.e. substitute planes for other modes if the
-journey is sufficiently short?
-*** Duration
-Linear matching + adaptation.
-*** Season
-Match summer/winter/spring/autumn, unless month is adjacent.
-*** Hotel
-If selected, only match on perfect match.
+The type of accommodation is assumed to not be a defining attribute of
+a holiday, and so to be of relatively low importance. Thus, it is
+assigned the weight 2.
+
+**** Duration
+The duration of the holiday is measured in days. A simple numeric
+distance is employed for the similarity metric. To normalise
+distances, the range of possible durations is extracted from the case
+base. Queries that fall outside this range is supported by dynamically
+adjusting the range as appropriate.
+
+It seems a fair assumption that a holiday can be straight-forwardly
+modified to be longer, with a corresponding increase in price. Based
+on this assumption, duration is an adjustable attribute (see the
+section on adaptation for details on how this works). Because of this,
+it is given a low weight of 1.
+
+**** Holiday type
+The holiday type is a type such as 'Active', 'Adventure', 'City', etc.
+of the holiday. The possible values for holiday types are entered
+manually into a taxonomy tree. Matching is done by finding the first
+common ancestor of the values being compared. The similarity for that
+node is the value of the similarity metric. The tree for holiday type
+is taken from the example in the [[http://www.cs.auckland.ac.nz/%257Eian/CBR/cbr03.pdf][lecture slides]] and looks as follows:
+
+:                                 /-- Adventure
+:                  /- Active (0.5) -- Diving
+:                 /               \-- Skiing
+:                /                 \- Surfing
+:  Arbitrary (0.3)
+:             \ \ \-- City (0.5) -- Shopping
+:              \ \
+:               \ \-- Education (0.5) -- Language
+:                \
+:                 \-- Recreation (0.6) -- Bathing
+:                                     \-- Wandering
+
+Considering that e.g. a skiing holiday is quite significantly
+different from a shopping holiday, the type of holiday is considered
+an important metric, and given a weight of 10.
+**** Hotel
+The hotel attribute is the name of the hotel for the holiday. Since
+no valid characteristics can be extracted from the name of the hotel
+itself (and the type of hotel is covered in its own attribute) a match
+is made only on the exact name, and a match of zero otherwise. it is
+assumed that if a hotel name is specified in the query, it is a very
+outspoken preference to go to a specific hotel, and thus it is given a
+weight of 10.
+
+**** Journey code
+The journey code is the internal code given to a holiday, and is a
+numeric value. Since this is completely arbitrary, it is interpreted
+as a way to find a specific holiday. This means matching is done only
+on an exact value match, and it is given a weight of 100, thus
+drowning out all other values. So specifying a journey code is pretty
+much guaranteed to return the holiday with that code as the best match
+(if such a holiday exists).
+
+**** Price
+The price attribute specifies the monetary payment for the holiday, as
+an integer value. Similarity is computed based on simple numerical
+distance, with the same dynamic adjustment of range as is described
+for the duration attribute. Furthermore, it is assumed that, all
+other things being equal, a lower price is preferred. Thus, a 'less is
+perfect' metric is applied to the similarity measure.
+
+Furthermore, the price attribute is adjusted based on any adaptation
+of the adaptable attributes, as described in the section on
+adaptation.
+
+Under the assumption that people are fairly price-sensitive, price is
+given a relatively high weight of 5.
+
+**** Number of persons
+The number of persons a holiday accommodates is matches by linear
+numerical distance, with the same range adjustment as mentioned
+previously. Furthermore, like with the duration, it is assumed that a
+given holiday can be straight-forwardly modified to accommodate fewer
+or more people, with a corresponding change in price. This might be a
+stretch for extreme variations in number of people, but as an
+approximation, it is considered a reasonable assumption.
+
+Since the attribute is adaptable, it is given a low weight of 1.
+
+**** Region
+The geographical region of the holiday. Matching here is done using
+the location of the region. It is assumed that latitude is a better
+predictor of holiday similarity than distance. I.e. if someone wants
+to go on holiday in Egypt, a holiday on the Spanish island of Tenerife
+provides a better approximation on the type of holiday (i.e. both
+places are warm), than a holiday in Sweden, even though Sweden is
+slightly closer in direct distance.
+
+Bearing this in mind, region similarity is based on difference in
+latitude. To make matches better for holidays that are close to each
+other in latitude, a 10% weight is given to actual distance.
+
+The data for the distance calculation comes from Google Maps. The
+place names are input into the British version of the maps
+(maps.google.co.nz), and the first result is used. This is facilitated
+by the geopy Python library, which also provides a function to
+calculate geodesic distance between two points.
+
+For most of the regions in the case base, a good match is found
+straight away on a search. For the rest, a manual translation table is
+used to change the queries to match. Queries can be made on any
+location name that gives a match on the online search. The range of
+latitudes is adjusted as with the other numerical ranges, and the
+distance is clamped to the maximal distance between any two regions in
+the case base.
+
+The matches from the maps are not very precise (for example, matches
+on the name of a body of water gives a position in the middle of it).
+However, the benefits of this approach (i.e. (semi-)automatic
+assignment of geographical values, and the ability to query for
+arbitrary locations) outweigh the drawbacks of the approach. However,
+because of this inaccuracy, the region similarity is given the
+relatively low weight of 2.
+
+**** Season
+The season of the holiday is specified as a month. A similarity of 1
+is assigned if there's an exact match on the month name. Otherwise, if
+the two values share the same season (i.e. winter, spring, summer
+autumn), a similarity of 0.5 is assigned. Additionally, if the two
+months are adjacent (e.g. February and March), a similarity of 0.5 is
+also assigned. Otherwise, a similarity of 0 is assigned.
+
+This approach is based on the assumption that people are usually
+fairly sensitive as to when they are able to go on holiday. The
+adjacent month addition to the traditional seasonal matching reflects
+the fact that there might be a slight fuzziness of this seasonal
+sensitivity. Because of the inaccuracy of this measurement, a fairly
+low weight of 2 is assigned to the season attribute.
+
+**** Transportation
+The transportation attribute similarity is defined by the following
+table:
+
+|       | Car | Coach | Plane | Train |
+| Car   | 1.0 |   0.8 |   0.0 |   0.5 |
+| Coach | 0.6 |   1.0 |   0.0 |   0.8 |
+| Plane | 0.0 |   0.0 |   1.0 |   0.3 |
+| Train | 0.4 |   0.8 |   0.0 |   1.0 |
+
+This table is created with a premise of being environmentally friendly
+where possible, so alternatives that are more environmentally
+friendly are considered more similar than less environmentally
+friendly alternatives. Since any assignment of similarities is in
+essence arbitrary, it seems reasonable to be arbitrary in an
+environmentally friendly way.
+
+For each mode of transport, the rationale is as follows:
+
+- *Car*: The dominant characteristic of the car is that it is
+  land-based, specifically road-based. Thus, it is most similar to a
+  coach, and slightly less similar to a train. Not similar to a plane
+  at all, since if someone prefers to go by car, they probably don't
+  like flying, for either environmental or hassle reasons.
+
+- *Coach*: Land-based, and a form of collective transportation. Thus,
+  it is most similar to a train (also land-based and collective), and
+  less similar to a car (land-based, but not collective).
+
+- *Plane*: The assumption here is that if someone prefers to fly, it
+  is first and foremost a travel time issue. Thus, only the train
+  is in any way comparable (under the assumption that the train is
+  relatively high-speed, which is true for certain parts of Europe).
+
+- *Train*: High-speed, land-based and collective. Most similar to the
+  coach, somewhat similar to the car. Not similar to the plane at all,
+  because the train is the most environmentally friendly, and the
+  plane is the worst, by a long way.
+
 ** Adaptation of results
 Adapt price for number of persons and duration (semi)linearly.
 ** Code structure
