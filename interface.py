@@ -55,7 +55,6 @@ class Interface(Console):
             self.prompt = self.intro = ""
             self.interactive = False
             self.config['auto_run'] = False
-            self.config['auto_display'] = False
         else:
             self.interactive = True
 
@@ -79,7 +78,7 @@ class Interface(Console):
                              'query     Manipulate and run query.',
                              'result    Show result of a query.',
                              'config    Set config variables.',
-                             'exit      Exit program.'])
+                             'exit      Exit application.'])
 
     def help_help(self):
         print self.gen_help("do_help"),
@@ -184,7 +183,6 @@ class Interface(Console):
             if not self.query:
                 print "No query to run."
                 return
-            print "Running query...",
             result = self.matcher.match(self.query, self.config['retrieve'])
             if result:
                 if self.config['adapt']:
@@ -193,12 +191,10 @@ class Interface(Console):
                     except AdaptationError:
                         pass
                 self.result = (Case(self.query), result)
-                print "done.",
                 if self.config['auto_display']:
-                    print
                     self.do_result("")
-                else:
-                    print " Use the 'result' command to view the result."
+                elif self.interactive:
+                    print "Query run successfully. Use the 'result' command to view the result."
             else:
                 print "no result."
         else:
