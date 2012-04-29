@@ -317,11 +317,30 @@ to Case objects, and various helper objects live in the place, tree,
 table_printer and util modules.
 
 ** Interface
-Console (readline-ish) interface.
+The interface is an interactive command shell, providing commands to
+manipulate and run a query and view the results, as well as to set
+various configuration parameters. The command shell, while not as
+flashy as a traditional graphical interface, is significantly easier
+to develop, and furthermore lends itself well to scripting and batch
+processing of queries. Furthermore, since the values to be shown and
+queried are primarily textual in nature, they lend themselves well to
+a console interface.
+
+To make up for the fact that the command interface is somewhat less
+discoverable than a graphical user interface, an extensive online help
+system and command tab-completion is built in to the interface.
+
+The main unmitigated drawback of this choice of interface is the
+difficulty in showing many results side-by-side. Because of the number
+of attributes in the case-base, queries have to be shown side-by-side.
+Thus, the width of the user console window in practice limits the
+display to 3-4 cases at once, assuming no horizontal scroll
+capability. Running queries in batch mode, and redirecting the output
+to a text file, to be viewed in an editor, is a way of overcoming this
+limitation.
 
 * Footnotes
 
 [fn:1] No such cases exist in the travel case base, but in principle
 they might.
-
 
