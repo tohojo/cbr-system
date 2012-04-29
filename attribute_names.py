@@ -253,10 +253,10 @@ class Accommodation(attributes.MoreIsPerfect):
             return "Holiday flat"
         return "%s stars" % self._numbers[self.value]
 
-class Hotel(attributes.ExactMatch):
+class Hotel(attributes.CaseLessMatch):
     """Name of hotel.
 
-    Only matches exact name of hotel.
+    Only matches exact name of hotel (in a case-insensitive manner).
 
     Possible values: Any string."""
 

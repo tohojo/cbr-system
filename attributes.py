@@ -212,6 +212,15 @@ class ExactMatch(Attribute):
         else:
             return 0.0
 
+class CaseLessMatch(Attribute):
+    """Case-insensitive match on attribute value."""
+
+    def similarity(self, other):
+        if self.value.lower() == other.value.lower():
+            return self.weight
+        else:
+            return 0.0
+
 class Numeric(Attribute):
     """Attribute with positive numeric values."""
 
