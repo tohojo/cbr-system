@@ -279,19 +279,43 @@ and in any case a more sophisticated technique would probably require
 a fair bit of very specific domain knowledge.
 
 ** Code structure
-The main parts of the application are the Case and Attribute classes
-(and subclasses of the latter). The Case class defines an entire case,
-and how to match it to another case. Each attribute is represented by
-an appropriate Attribute subclass, which defines how to match values for
-this attribute to each other, whether or not to adapt attribute
-values, etc.
+The code is divided into appropriate classes, the main ones being the
+Case, Matcher and Attribute classes.
 
-The subclasses of the Attribute class define how to match attributes
-to each other. Subclasses are defined for each type of matching (e.g.
-exact matching, less is perfect matching, etc), and for adaptation
-types (e.g. numerical adaptation). Classes are defined for the
-attribute names which inherit the corresponding matching classes,
-setting relevant parameters.
+The BaseAttribute is an abstract superclass specifying the interface
+an Attribute must conform to. From here various subclasses are defined
+for each type of matching (e.g. exact matching, less is perfect
+matching, tree-based matching, etc), and for adaptation types (e.g.
+numerical adaptation). These classes are sought to be fairly general,
+and all live in the ~attribute~ module. The concrete classes for the
+attribute types live in the ~attribute_names~ module, and use
+(multiple) inheritance to specify the types of matching to be done, as
+well as override methods to check input and convert values to the
+appropriate types. For attributes requiring special matching rules
+(such as the region attribute), the similarity metrics are implemented
+directly in the attribute.
+
+The Case class is a specialised dictionary class, that takes values
+and converts them into the appropriate attribute classes based on
+name. This includes the attribute class input value checking, as well
+as checking the attribute names (attribute names for which a matching
+attribute class exists are considered valid). Furthermore, the Case
+class specifies the similarity metric, and specifies a method to adapt
+one case to another.
+
+The Matcher class specifies the actual matching and adaptation
+methods, in terms of Case objects. That is, the matcher has a ~match~
+method, that maps the similarity metric of the query Case object to
+each case in the case base, and returns the best matches. Similarly,
+it has an ~adapt~ method, that checks whether or not adaptation makes
+sense (i.e. whether adaptable attributes are present in the query),
+and whether the adaptation is worse than the best result.
+
+Finally, the Interface class specifies the interface, the parser
+module contains functions that will parse .csv files or .cases files
+to Case objects, and various helper objects live in the place, tree,
+table_printer and util modules.
+
 ** Interface
 Console (readline-ish) interface.
 
