@@ -20,7 +20,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
+import os, sys
 
 try:
     import cPickle as pickle
@@ -41,13 +41,14 @@ try:
 except ImportError:
     pass
 
-from matcher import Matcher
-from interface import Interface
-import attribute_names
 
 case_filename = "cases.pickle"
 
 def main():
+    from matcher import Matcher
+    from interface import Interface
+    import attribute_names
+
     if os.path.exists(case_filename):
         with open(case_filename, "rb") as fp:
             ranges,cases = pickle.load(fp)
@@ -62,4 +63,8 @@ def main():
     interface.cmdloop()
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except RuntimeError, e:
+        sys.stderr.write("Fatal error occurred: %s\n" % e)
+        sys.exit(1)

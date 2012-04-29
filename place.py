@@ -25,7 +25,10 @@ try:
 except ImportError:
     import pickle
 
-from geopy import geocoders, distance
+try:
+    from geopy import geocoders, distance
+except ImportError:
+    raise RuntimeError("Could not find geopy library. See http://code.google.com/p/geopy/.")
 
 geocoder = geocoders.Google(domain="maps.google.co.uk")
 location_cache_filename = "location_cache.pickle"

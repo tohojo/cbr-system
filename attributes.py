@@ -279,10 +279,6 @@ class TableMatch(Attribute):
     _match_table = {}
 
     def similarity(self, other):
-        if not self.value in self._match_table:
-            raise RuntimeError("Own value not found in match table: %s" % self.value)
-        if not other.value in self._match_table[self.value]:
-            raise RuntimeError("Other's value not found in match table: %s" % other.value)
         return self._match_table[self.value][other.value] * self.weight
 
     def _set_value(self, value):
