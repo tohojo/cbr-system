@@ -265,10 +265,19 @@ class LessIsPerfect(LinearMatch):
     """A 'Less is perfect' match, which is a linear match except when
     the other value is less than this one, in which case it is a
     perfect match."""
-    #TODO: Which is self, which is other? Consistency! :)
 
     def similarity(self,other):
         if other.value < self.value:
+            return self.weight
+        return LinearMatch.similarity(self,other)
+
+class MoreIsPerfect(LinearMatch):
+    """A 'Less is perfect' match, which is a linear match except when
+    the other value is less than this one, in which case it is a
+    perfect match."""
+
+    def similarity(self,other):
+        if other.value > self.value:
             return self.weight
         return LinearMatch.similarity(self,other)
 

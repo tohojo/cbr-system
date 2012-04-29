@@ -211,7 +211,7 @@ class Season(attributes.Attribute):
         return 0.0
 
 
-class Accommodation(attributes.LinearMatch):
+class Accommodation(attributes.MoreIsPerfect):
     """Type of accommodation for holiday.
 
     Number of stars of hotel. A holiday flat is considered 0 stars.
