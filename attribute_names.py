@@ -228,8 +228,8 @@ class Accommodation(attributes.MoreIsPerfect):
     # start of a string, either in numerical or letter form.
     _numbers_match = re.compile("^\s*(?P<number>"+\
                                 ("|".join(map(str,_numbers_rev.keys()+_numbers_rev.values()))+")"), re.I)
-    _scale = 4.0
     _weight = 2.0
+    _range = [0.0, 5.0]
 
     def _set_value(self, value):
         """Convert a value of type 'TwoStars' into an integer"""
