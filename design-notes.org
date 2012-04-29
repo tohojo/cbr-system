@@ -81,7 +81,7 @@ of the holiday. The possible values for holiday types are entered
 manually into a taxonomy tree. Matching is done by finding the first
 common ancestor of the values being compared. The similarity for that
 node is the value of the similarity metric. The tree for holiday type
-is taken from the example in the [[http://www.cs.auckland.ac.nz/%257Eian/CBR/cbr03.pdf][lecture slides]] and looks as follows:
+is taken from the example in the [[http://www.cs.auckland.ac.nz/~ian/CBR/cbr03.pdf][lecture slides]] and looks as follows:
 
 :                                 /-- Adventure
 :                  /- Active (0.5) -- Diving
