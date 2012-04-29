@@ -41,7 +41,7 @@ travel case base. In order to define similarity metrics, a
 domain-specific interpretation of each attribute is necessary. This
 section explains this interpretation and the resulting similarity
 metrics and weights for each attribute. Similarity metrics are given
-in the range [0-1], and weights in the range [1-\inf[.
+in the range $[0;1]$, and weights in the range $[1;\infty[$.
 
 As a general note, because of the way matching works (i.e. absent
 values from a query are ignored), the mere fact of an attribute being

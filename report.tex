@@ -1,25 +1,14 @@
 % Created 2012-04-29 Sun 19:01
-\documentclass[11pt]{article}
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{fixltx2e}
-\usepackage{graphicx}
-\usepackage{longtable}
-\usepackage{float}
-\usepackage{wrapfig}
-\usepackage{soul}
-\usepackage{textcomp}
-\usepackage{marvosym}
-\usepackage{wasysym}
-\usepackage{latexsym}
-\usepackage{amssymb}
-\usepackage{hyperref}
-\tolerance=1000
-\providecommand{\alert}[1]{\textbf{#1}}
+\documentclass[a4paper,11pt]{scrartcl}
+\usepackage[danish,british]{babel}
+\usepackage[english]{varioref}
+\usepackage{tohojo-xe}
+\selectlanguage{british}
+\usetikzlibrary{positioning,shadows,arrows}
 
-\title{COMPSCI 767 Assignment 1 - a case based reasoner}
+\title{Cased Based Reasoning System}
 \author{Toke Høiland-Jørgensen}
-\date{\today}
+\date{29 April 2012}
 \hypersetup{
   pdfkeywords={},
   pdfsubject={},
@@ -29,93 +18,34 @@
 
 \maketitle
 
+\begin{center}
+\sffamily
+{\large COMPSCI 767 assignment 1}\\
+Semester 1, 2012\\
+University of Auckland
+\end{center}
+
 \setcounter{tocdepth}{3}
 \tableofcontents
 \vspace*{1cm}
 
 \section{Introduction}
-This report provides details on the case based reasoner implementation
-for the travel case base. The first section of the report provides
-information on installing and running the application. The second
-section documents the application design, including the case retrieval
-mechanism, similarity metrics, adaptation mechanism, code structure
-and interface.
+This report provides details on a case based reasoner implementation
+for the travel case base. The first section of the report documents
+the application design, including the case retrieval mechanism,
+similarity metrics, adaptation mechanism, code structure and
+interface. The second section provides information on installing and
+running the application.
 
 The code, if not found along with the report, can be obtained from
 GitHub at \url{https://github.com/tohojo/cbr-system}.
-
-\section{Installing and running the application}
-The application is tested and written using Python 2.7, but will
-probably work in 2.5 and 2.6 as well. Apart from the standard library,
-the application depends on the
-\href{http://code.google.com/p/geopy/}{geopy library}. See the project
-website for installation details (or just try issuing \texttt{sudo
-  easy\_install geopy}).
-
-To run the application, simply run \texttt{./main.py} (on unix) or
-\texttt{python2 main.py} (on any platform). The application runs as a
-command-line console, and uses the readline library (if available) to
-provide command line history and completion.
-
-A typical workflow for using the application is to set query
-parameters using the \verb~query set~ command, which will (by default)
-also run a query against the case-base.
-
-The application strives to be self-documenting via the built-in help
-command. Simply type \verb~help~ when inside the application, to get a
-list of commands. The following is the output of the help command (>>
-is the application prompt):
-
-\begin{verbatim}
- >> help
- These are the accepted commands.
- Type help <command> to get help on a specific command.
-
- status    Show summary of system status.
- query     Manipulate and run query.
- result    Show result of a query.
- config    Set config variables.
- exit      Exit application.
-\end{verbatim}
-
-\subsection{Running in batch mode}
-Commands can be run in batch-mode by piping multiple commands (one on
-each line) to the standard input of the application. When run in batch
-mode, automatic running of queries is turned off by default. Thus, an
-explicit command of \verb~query run~ is needed to run the query and
-show the results. This allows multiple query parameters to be set,
-while only printing the final result.
-
-If desired, the automatic behaviour can be turned back on by the
-\verb~config~ command.
-
-\subsection{Loading the case-base}
-If found, the case-base is loaded from `cases.pickle' in the current
-directory, which contains a parsed case-base. The case-base can be
-(re)parsed by running parser.py, which can parse either a .csv file,
-or a .cases file (from the travel case base) and writes the result to
-cases.pickle. Examples of both files are provided with the
-application. The parsed case-base contains the cases from reise.cases.
-
-\subsection{Location search}
-To provide similarity metrics, a location-based search (provided by
-the geopy library) is used. This searches maps.google.co.nz for the
-provided place-name (a correction table is provided to ensure useful
-matches for all locations in the travel case base), and uses the first
-match for the similarity metric.
-
-For this to work, an internet connection must be available. Looked up
-names are stored in a cache, saved between program runs. Provided with
-the application, is a cache containing all place names in the travel
-case base (clear this by removing ``location_cache.pickle''). If no
-internet connection is available, lookup only works on already cached
-items.
+\clearpage
 
 \section{Application design}
-These notes detail the overall design of the CBR system application.
-This consists of four five parts: retrieval of cases, similarity
-metrics, adaptation, code structure and interface. Familiarity with
-CBR concepts is assumed, and only notes relating to the specific
+This section details the overall design of the CBR system application.
+This consists of five parts: retrieval of cases, similarity metrics,
+adaptation, code structure and interface. Familiarity with CBR
+concepts is assumed, and only notes relating to the specific
 implementation are included.
 
 \subsection{Case retrieval}
@@ -124,7 +54,7 @@ For details of how this relates to the code, see the section on code
 structure. The similarity metrics for the case base attributes are
 explained in the next section on similarity metrics.
 
-Retrieval is done using a simple k nearest neighbour search, where a
+Retrieval is done using a simple $k$ nearest neighbour search, where a
 submitted query is compared to each case in the case base to derive a
 similarity for that case. Since the travel case base is quite small
 (1470 cases), retrieval using this brute-force search method results
@@ -132,7 +62,7 @@ in sub-second query run performance, so a more efficient retrieval
 algorithm is unnecessary.
 
 After comparison, the cases are sorted by similarity in descending
-order and the k best matches are returned, where k is
+order and the $k$ best matches are returned, where $k$ is
 user-configurable and defaults to 2. Cases that have the same
 similarity score for the current query are returned in arbitrary
 order.
@@ -145,9 +75,10 @@ of this weighed sum is the case similarity.
 Since a query need not include all attributes, only those attributes
 included in the query are used for calculating the similarity metric.
 This is different from the behaviour if a case in the case base is
-missing an attribute that is present in the query\protect\footnote{No such cases exist in the travel case base, but in principle
-they might. }: In this case
-a similarity of 0.0 is assumed for this attribute.
+missing an attribute\protect\footnote{No such cases exist in the
+  travel case base, but in principle they might. } that is present in
+the query: In this case a similarity of 0.0 is assumed for this
+attribute.
 
 \subsection{Similarity metrics}
 Similarity metrics and weights are defined for each attribute of the
@@ -155,7 +86,7 @@ travel case base. In order to define similarity metrics, a
 domain-specific interpretation of each attribute is necessary. This
 section explains this interpretation and the resulting similarity
 metrics and weights for each attribute. Similarity metrics are given
-in the range [0-1], and weights in the range [1-$\inf$[.
+in the range $[0;1]$, and weights in the range $[1;\infty[$.
 
 As a general note, because of the way matching works (i.e. absent
 values from a query are ignored), the mere fact of an attribute being
@@ -164,7 +95,7 @@ journey code or hotel name) do not make sense to specify in a query
 unless there's a very strong preference of that exact value.
 
 \subsubsection{Accommodation}
-The Accommodation attribute defines the quality of the holiday
+The accommodation attribute defines the quality of the holiday
 accommodation. The possible values are either a holiday flat, or a one
 to five star hotel. To simplify things, a holiday flat is interpreted
 as a `zero-star' hotel. This means that matching can be done on the
@@ -193,24 +124,41 @@ it is given a low weight of 1.
 \subsubsection{Holiday type}
 The holiday type is a type such as `Active', `Adventure', `City', etc.
 of the holiday. The possible values for holiday types are entered
-manually into a taxonomy tree. Matching is done by finding the first
-common ancestor of the values being compared. The similarity for that
-node is the value of the similarity metric. The tree for holiday type
-is taken from the example in the \href{http://www.cs.auckland.ac.nz/~ian/CBR/cbr03.pdf}{lecture slides} and looks as follows:
+manually into a taxonomy tree. Matching is done by finding the closest
+common ancestor of the values being compared. The value for that node
+is the value of the similarity metric. The tree for holiday type is
+taken from the example in the lecture
+slides\footnote{\url{http://www.cs.auckland.ac.nz/~ian/CBR/cbr03.pdf}.}
+and looks as follows (where the numbers in parenthesis is the
+similarity when that node is the common ancestor):
 
-\begin{verbatim}
-                                 /-- Adventure
-                  /- Active (0.5) -- Diving
-                 /               \-- Skiing
-                /                 \- Surfing
-  Arbitrary (0.3)
-             \ \ \-- City (0.5) -- Shopping
-              \ \
-               \ \-- Education (0.5) -- Language
-                \
-                 \-- Recreation (0.6) -- Bathing
-                                     \-- Wandering
-\end{verbatim}
+\begin{center}
+\begin{tikzpicture}[
+every node/.style={rectangle, draw=none, rounded corners=1mm, fill=blue, drop shadow,
+        align=center, text height=9pt, text depth=2pt, anchor=north, text=white, minimum height=7mm},
+leaf/.style={fill=red},
+level distance=1cm
+]
+  \node {Arbitrary (0.3)}[sibling distance=3cm]
+      child { [sibling distance=2.0cm,level distance=2.2cm]
+        node {Active (0.5)}
+           child {node [leaf] {Adventure}}
+           child {node [leaf] {Diving}}
+           child {node [leaf] {Skiing}}
+           child {node [leaf] {Surfing}}}
+      child {
+        node {City (0.5)}
+          child {node [leaf] {Shopping}}}
+      child {
+        node {Education (0.5)}
+          child {node [leaf] {Language}}}
+      child { [sibling distance=2cm]
+        node {Recreation (0.6)}
+          child {node [leaf] {Bathing}}
+          child {node [leaf] {Wandering}}}
+      ;
+\end{tikzpicture}
+\end{center}
 
 Considering that e.g. a skiing holiday is quite significantly
 different from a shopping holiday, the type of holiday is considered
@@ -246,7 +194,7 @@ Furthermore, the price attribute is adjusted based on any adaptation
 of the adaptable attributes, as described in the section on
 adaptation.
 
-Under the assumption that people are fairly price-sensitive, price is
+From the assumption that people are fairly price-sensitive, price is
 given a relatively high weight of 5.
 
 \subsubsection{Number of persons}
@@ -261,13 +209,13 @@ approximation, it is considered a reasonable assumption.
 Since the attribute is adaptable, it is given a low weight of 1.
 
 \subsubsection{Region}
-The geographical region of the holiday. Matching here is done using
-the location of the region. It is assumed that latitude is a better
-predictor of holiday similarity than distance. I.e. if someone wants
-to go on holiday in Egypt, a holiday on the Spanish island of Tenerife
-provides a better approximation on the type of holiday (i.e. both
-places are warm), than a holiday in Sweden, even though Sweden is
-slightly closer in direct distance.
+This attribute holds the geographical region of the holiday. Matching
+here is done using the location of the region. It is assumed that
+latitude is a better predictor of holiday similarity than distance.
+I.e. if someone wants to go on holiday in Egypt, a holiday on the
+Spanish island of Tenerife provides a better approximation on the type
+of holiday (i.e. both places are warm), than a holiday in Sweden, even
+though Sweden is slightly closer in direct distance.
 
 Bearing this in mind, region similarity is based on difference in
 latitude. To make matches better for holidays that are close to each
@@ -296,9 +244,9 @@ because of this inaccuracy, the region similarity is given the
 relatively low weight of 2.
 
 \subsubsection{Season}
-The season of the holiday is specified as a month. A similarity of 1
-is assigned if there's an exact match on the month name. Otherwise, if
-the two values share the same season (i.e. winter, spring, summer
+The season of the holiday is specified by month name. A similarity of
+1 is assigned if there's an exact match on the month name. Otherwise,
+if the two values share the same season (i.e. winter, spring, summer
 autumn), a similarity of 0.5 is assigned. Additionally, if the two
 months are adjacent (e.g. February and March), a similarity of 0.5 is
 also assigned. Otherwise, a similarity of 0 is assigned.
@@ -317,15 +265,14 @@ table:
 
 \begin{center}
 \begin{tabular}{l|rrrr}
-        &  Car  &  Coach  &  Plane  &  Train  \hline\\
+        &  Car  &  Coach  &  Plane  &  Train  \\
+\hline
  Car    &  1.0  &    0.8  &    0.0  &    0.5  \\
  Coach  &  0.6  &    1.0  &    0.0  &    0.8  \\
  Plane  &  0.0  &    0.0  &    1.0  &    0.3  \\
  Train  &  0.4  &    0.8  &    0.0  &    1.0  \\
 \end{tabular}
 \end{center}
-
-
 
 This table is created with a premise of being environmentally friendly
 where possible, so alternatives that are more environmentally
@@ -339,26 +286,25 @@ For each mode of transport, the rationale is as follows:
 \begin{itemize}
 \item \textbf{Car}: The dominant characteristic of the car is that it is
   land-based, specifically road-based. Thus, it is most similar to a
-  coach, and slightly less similar to a train. Not similar to a plane
-  at all, since if someone prefers to go by car, they probably don't
-  like flying, for either environmental or hassle reasons.
-\item \textbf{Coach}: Land-based, and a form of collective transportation. Thus,
-  it is most similar to a train (also land-based and collective), and
-  less similar to a car (land-based, but not collective).
-\item \textbf{Plane}: The assumption here is that if someone prefers to fly, it
-  is first and foremost a travel time issue. Thus, only the train
-  is in any way comparable (under the assumption that the train is
-  relatively high-speed, which is true for certain parts of Europe).
-\item \textbf{Train}: High-speed, land-based and collective. Most similar to the
-  coach, somewhat similar to the car. Not similar to the plane at all,
-  because the train is the most environmentally friendly, and the
-  plane is the worst, by a long way.
+  coach, slightly less similar to a train and not similar to a plane
+  at all.
+\item \textbf{Coach}: Land-based, and a form of shared transportation.
+  Thus, it is most similar to a train (also land-based and shared),
+  and less similar to a car (land-based, but not shared).
+\item \textbf{Plane}: The assumption here is that if someone prefers
+  to fly, it is first and foremost a travel time issue. Thus, only the
+  train is in any way comparable (under the assumption that the train
+  is relatively high-speed, which is true for certain parts of
+  Europe).
+\item \textbf{Train}: High-speed, land-based and shared. Most similar
+  to the coach, somewhat similar to the car. Not similar to the plane
+  at all, because the train is the most environmentally friendly, and
+  the plane is the worst, by a long way.
 \end{itemize}
 
 \subsection{Adaptation of results}
 Query results can be adapted to better match the query (whether or not
-this is done is a user configuration parameter, that is on by
-default).
+this is done is a user configuration parameter, enabled default).
 
 For adaptation, it is assumed that the travel agency is somewhat
 flexible, and is not the type that just sells pre-packaged holidays.
@@ -378,18 +324,17 @@ is simply the product of the adaptation distance for the individual
 attributes.
 
 Based on this adaptation distance, the attributes marked to be
-adjusted based on adaption (i.e. the price) are adjusted by the
-distance. A new adapted case is constructed with the new adapted and
-adjusted values, and the match case attribute values for all other
-attributes. This new case is tested for similarity against the query,
-and if it is a better match than the best query match, it is returned
-as the adapted case.
+adjusted based on adaption (i.e. the price) are adjusted. A new
+adapted case is constructed with the new adapted and adjusted values,
+and the match case attribute values for all other attributes. This new
+case is tested for similarity against the query, and if it is a better
+match than the best query match, it is returned as the adapted case.
 
 The adapted case might not be a better match, because of the
 adjustment of the price based on the adaptation distance. If a price
 is specified in the query, this adjustment might make it a worse
 match; and since the weight of the price attribute is fairly high,
-this might be detrimental to the match of the adjustment.
+this might be detrimental to the result.
 
 As mentioned initially in this section, the assumption that holidays
 can be adjusted might only be valid within certain bounds. However, no
@@ -447,10 +392,11 @@ The interface is an interactive command shell, providing commands to
 manipulate and run a query and view the results, as well as to set
 various configuration parameters. The command shell, while not as
 flashy as a traditional graphical interface, is significantly easier
-to develop, and furthermore lends itself well to scripting and batch
-processing of queries. Furthermore, since the values to be shown and
-queried are primarily textual in nature, they lend themselves well to
-a console interface.
+to develop, lowers the number of external library requirements of the
+application, and lends itself well to scripting and batch processing
+of queries. Furthermore, since the values to be shown and queried are
+primarily textual in nature, they lend themselves well to a console
+interface.
 
 To make up for the fact that the command interface is somewhat less
 discoverable than a graphical user interface, an extensive online help
@@ -460,9 +406,79 @@ The main unmitigated drawback of this choice of interface is the
 difficulty in showing many results side-by-side. Because of the number
 of attributes in the case-base, queries have to be shown side-by-side.
 Thus, the width of the user console window in practice limits the
-display to 3-4 cases at once, assuming no horizontal scroll
+display to 2-3 cases at once, assuming no horizontal scroll
 capability. Running queries in batch mode, and redirecting the output
 to a text file, to be viewed in an editor, is a way of overcoming this
 limitation.
+
+\clearpage
+\section{Installing and running the application}
+The application is tested and written using Python 2.7, but will
+probably work in 2.5 and 2.6 as well. Apart from the standard library,
+the application depends on the geopy library. See the project
+website\footnote{\url{http://code.google.com/p/geopy/}.} for
+installation details (or just try issuing \texttt{sudo easy\_install
+  geopy}).
+
+To run the application, simply run \texttt{./main.py} (on unix) or
+\texttt{python2 main.py} (on any platform). The application runs as a
+command-line console, and uses the readline library (if available) to
+provide command line history and completion.
+
+A typical workflow for using the application is to set query
+parameters using the \verb~query set~ command, which will (by default)
+also run a query against the case-base.
+
+The application strives to be self-documenting via the built-in help
+command. Simply type \verb~help~ when inside the application, to get a
+list of commands. The following is the output of the help command (\verb~>>~
+is the application prompt):
+
+\small
+\begin{verbatim}
+ >> help
+ These are the accepted commands.
+ Type help <command> to get help on a specific command.
+
+ status    Show summary of system status.
+ query     Manipulate and run query.
+ result    Show result of a query.
+ config    Set config variables.
+ exit      Exit application.
+\end{verbatim}
+
+\subsection{Running in batch mode}
+Commands can be run in batch-mode by piping multiple commands (one on
+each line) to the standard input of the application. When run in batch
+mode, automatic running of queries is turned off by default. Thus, an
+explicit command of \verb~query run~ is needed to run the query and
+show the results. This allows multiple query parameters to be set,
+while only printing the final result.
+
+If desired, the automatic behaviour can be turned back on by the
+\verb~config~ command.
+
+\subsection{Loading the case-base}
+If found, the case-base is loaded from `cases.pickle' in the current
+directory, which contains a parsed case-base. The case-base can be
+(re)parsed by running parser.py, which can parse either a .csv file,
+or a .cases file (from the travel case base) and writes the result to
+cases.pickle. Examples of both files are provided with the
+application. The parsed case-base contains the cases from reise.cases.
+
+\subsection{Location search}
+To provide similarity metrics, a location-based search (provided by
+the geopy library) is used. This searches maps.google.co.nz for the
+provided place-name (a correction table is provided to ensure useful
+matches for all locations in the travel case base), and uses the first
+match for the similarity metric.
+
+For this to work, an internet connection must be available. Looked up
+names are stored in a cache, saved between program runs. Provided with
+the application, is a cache containing all place names in the travel
+case base (clear this by removing the file
+\verb~location_cache.pickle~). If no internet connection is
+available, lookup only works on already cached items.
+
 
 \end{document}
