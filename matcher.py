@@ -27,7 +27,7 @@ class Matcher(object):
         self.cases = cases
 
     def match(self, query, count):
-        """Match a query to the case base and the count best matches."""
+        """Match a query to the case base and return the best matches."""
         # Construct a list of tuples (similarity, case) from all cases
         # in the case base.
         similarities = zip(map(query.similarity, self.cases), self.cases)
@@ -50,7 +50,7 @@ class Matcher(object):
         sim,best = result[0]
 
         # The adaptable attributes are all those that are marked as
-        # adapted, and that differ in value between the query and the
+        # such, and that differ in value between the query and the
         # case.
         adaptable = [k for (k,v) in query.items() if v.adaptable and query[k] != best[k]]
         if not adaptable:
