@@ -31,15 +31,15 @@ command. Simply type ~help~ when inside the application, to get a list
 of commands. The following is the output of the help command (>> is
 the application prompt):
 
-~>> help
-These are the accepted commands.
-Type help <command> to get help on a specific command.
-
-status    Show summary of system status.
-query     Manipulate and run query.
-result    Show result of a query.
-config    Set config variables.
-exit      Exit application.~
+: >> help
+: These are the accepted commands.
+: Type help <command> to get help on a specific command.
+: 
+: status    Show summary of system status.
+: query     Manipulate and run query.
+: result    Show result of a query.
+: config    Set config variables.
+: exit      Exit application.
 
 *** Running in batch mode
 Commands can be run in batch-mode by piping multiple commands (one on
