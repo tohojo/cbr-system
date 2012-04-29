@@ -1,14 +1,15 @@
 * Application design notes
 These notes detail the overall design of the CBR system application.
-This consists of four parts: retrieval of cases, adaptation, code
-structure and interface. Familiarity with CBR concepts is assumed, and
-only notes relating to the specific implementation are included.
+This consists of four five parts: retrieval of cases, similarity
+metrics, adaptation, code structure and interface. Familiarity with
+CBR concepts is assumed, and only notes relating to the specific
+implementation are included.
 
 ** Case retrieval
 This section describes the case retrieval process in general terms.
 For details of how this relates to the code, see the section on code
 structure. The similarity metrics for the case base attributes are
-explained in the subsection on similarity metrics.
+explained in the next section on similarity metrics.
 
 Retrieval is done using a simple k nearest neighbour search, where a
 submitted query is compared to each case in the case base to derive a
@@ -34,7 +35,7 @@ This is different from the behaviour if a case in the case base is
 missing an attribute that is present in the query[fn:1]: In this case
 a similarity of 0.0 is assumed for this attribute.
 
-*** Similarity metrics
+** Similarity metrics
 Similarity metrics and weights are defined for each attribute of the
 travel case base. In order to define similarity metrics, a
 domain-specific interpretation of each attribute is necessary. This
@@ -48,7 +49,7 @@ present is evidence of a preference. I.e. some attributes (like
 journey code or hotel name) do not make sense to specify in a query
 unless there's a very strong preference of that exact value.
 
-**** Accommodation
+*** Accommodation
 The Accommodation attribute defines the quality of the holiday
 accommodation. The possible values are either a holiday flat, or a one
 to five star hotel. To simplify things, a holiday flat is interpreted
@@ -62,7 +63,7 @@ The type of accommodation is assumed to not be a defining attribute of
 a holiday, and so to be of relatively low importance. Thus, it is
 assigned the weight 2.
 
-**** Duration
+*** Duration
 The duration of the holiday is measured in days. A simple numeric
 distance is employed for the similarity metric. To normalise
 distances, the range of possible durations is extracted from the case
@@ -75,7 +76,7 @@ on this assumption, duration is an adjustable attribute (see the
 section on adaptation for details on how this works). Because of this,
 it is given a low weight of 1.
 
-**** Holiday type
+*** Holiday type
 The holiday type is a type such as 'Active', 'Adventure', 'City', etc.
 of the holiday. The possible values for holiday types are entered
 manually into a taxonomy tree. Matching is done by finding the first
@@ -98,7 +99,7 @@ is taken from the example in the [[http://www.cs.auckland.ac.nz/~ian/CBR/cbr03.p
 Considering that e.g. a skiing holiday is quite significantly
 different from a shopping holiday, the type of holiday is considered
 an important metric, and given a weight of 10.
-**** Hotel
+*** Hotel
 The hotel attribute is the name of the hotel for the holiday. Since
 no valid characteristics can be extracted from the name of the hotel
 itself (and the type of hotel is covered in its own attribute) a match
@@ -107,7 +108,7 @@ assumed that if a hotel name is specified in the query, it is a very
 outspoken preference to go to a specific hotel, and thus it is given a
 weight of 10.
 
-**** Journey code
+*** Journey code
 The journey code is the internal code given to a holiday, and is a
 numeric value. Since this is completely arbitrary, it is interpreted
 as a way to find a specific holiday. This means matching is done only
@@ -116,7 +117,7 @@ drowning out all other values. So specifying a journey code is pretty
 much guaranteed to return the holiday with that code as the best match
 (if such a holiday exists).
 
-**** Price
+*** Price
 The price attribute specifies the monetary payment for the holiday, as
 an integer value. Similarity is computed based on simple numerical
 distance, with the same dynamic adjustment of range as is described
@@ -131,7 +132,7 @@ adaptation.
 Under the assumption that people are fairly price-sensitive, price is
 given a relatively high weight of 5.
 
-**** Number of persons
+*** Number of persons
 The number of persons a holiday accommodates is matches by linear
 numerical distance, with the same range adjustment as mentioned
 previously. Furthermore, like with the duration, it is assumed that a
@@ -142,7 +143,7 @@ approximation, it is considered a reasonable assumption.
 
 Since the attribute is adaptable, it is given a low weight of 1.
 
-**** Region
+*** Region
 The geographical region of the holiday. Matching here is done using
 the location of the region. It is assumed that latitude is a better
 predictor of holiday similarity than distance. I.e. if someone wants
@@ -177,7 +178,7 @@ arbitrary locations) outweigh the drawbacks of the approach. However,
 because of this inaccuracy, the region similarity is given the
 relatively low weight of 2.
 
-**** Season
+*** Season
 The season of the holiday is specified as a month. A similarity of 1
 is assigned if there's an exact match on the month name. Otherwise, if
 the two values share the same season (i.e. winter, spring, summer
@@ -192,7 +193,7 @@ the fact that there might be a slight fuzziness of this seasonal
 sensitivity. Because of the inaccuracy of this measurement, a fairly
 low weight of 2 is assigned to the season attribute.
 
-**** Transportation
+*** Transportation
 The transportation attribute similarity is defined by the following
 table:
 
