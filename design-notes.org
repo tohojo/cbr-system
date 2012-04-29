@@ -232,7 +232,52 @@ For each mode of transport, the rationale is as follows:
   plane is the worst, by a long way.
 
 ** Adaptation of results
-Adapt price for number of persons and duration (semi)linearly.
+Query results can be adapted to better match the query (whether or not
+this is done is a user configuration parameter, that is on by
+default).
+
+For adaptation, it is assumed that the travel agency is somewhat
+flexible, and is not the type that just sells pre-packaged holidays.
+This means that the duration of the trip can be adjusted to fit the
+wish of the customer, and a different number of persons than the
+number listed in the holiday offer can be accommodated (both for a
+price, of course). Within certain limits, this seems like a reasonable
+assumption, given the assumption of travel agency flexibility.
+
+Adaptation works by considering the query specification and the best
+match of the search. For each of the adaptable attributes (duration
+and number of persons), if they are present in the query and their
+values are different from the best match, the adaptation distance is
+calculated as the query value divided by the match case value. If more
+than one adaptable attribute is present, the total adaptation distance
+is simply the product of the adaptation distance for the individual
+attributes.
+
+Based on this adaptation distance, the attributes marked to be
+adjusted based on adaption (i.e. the price) are adjusted by the
+distance. A new adapted case is constructed with the new adapted and
+adjusted values, and the match case attribute values for all other
+attributes. This new case is tested for similarity against the query,
+and if it is a better match than the best query match, it is returned
+as the adapted case.
+
+The adapted case might not be a better match, because of the
+adjustment of the price based on the adaptation distance. If a price
+is specified in the query, this adjustment might make it a worse
+match; and since the weight of the price attribute is fairly high,
+this might be detrimental to the match of the adjustment.
+
+As mentioned initially in this section, the assumption that holidays
+can be adjusted might only be valid within certain bounds. However, no
+bounds checking is done on adjustment values (or, indeed, query
+values) in the application. A strict bounds matching might be
+employed, or the adjustment of attributes might be non-linear, to
+overcome this. Alternatively, a more sophisticated adaptation
+technique might be employed. However, the current simple technique is
+considered sufficient to demonstrate a possible adaptation mechanism,
+and in any case a more sophisticated technique would probably require
+a fair bit of very specific domain knowledge.
+
 ** Code structure
 The main parts of the application are the Case and Attribute classes
 (and subclasses of the latter). The Case class defines an entire case,
