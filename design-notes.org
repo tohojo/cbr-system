@@ -1,4 +1,77 @@
-* Application design
+* Application design notes
+These notes detail the overall design of the CBR system application.
+This consists of four parts: retrieval of cases, adaptation, code
+structure and interface. Familiarity with CBR concepts is assumed, and
+only notes relating to the specific implementation are included.
+
+** Case retrieval
+This section describes the case retrieval process in general terms.
+For details of how this relates to the code, see the section on code
+structure. The similarity metrics for the case base attributes are
+explained in the subsection on similarity metrics.
+
+Retrieval is done using a simple k nearest neighbour search, where a
+submitted query is compared to each case in the case base to derive a
+similarity for that case. Since the travel case base is quite small
+(1470 cases), retrieval using this brute-force search method results
+in sub-second query run performance, so a more efficient retrieval
+algorithm is unnecessary.
+
+After comparison, the cases are sorted by similarity in descending
+order and the k best matches are returned, where k is
+user-configurable and defaults to 2. Cases that have the same
+similarity score for the current query are returned in arbitrary
+order.
+
+To derive a total similarity for a case, each attribute is compared to
+the query attributes, and a weighed sum (with weights defined for each
+attribute, see below) is calculated for the case. The normalised value
+of this weighed sum is the case similarity.
+
+Since a query need not include all attributes, only those attributes
+included in the query are used for calculating the similarity metric.
+This is different from the behaviour if a case in the case base is
+missing an attribute that is present in the query[fn:1]: In this case
+a similarity of 0.0 is assumed for this attribute.
+
+*** Similarity metrics
+Similarity metrics and weights are defined for each attribute of the
+travel case base. In order to define similarity metrics, a
+domain-specific interpretation of each attribute is necessary. This
+section explains this interpretation and the resulting similarity
+metrics and weights for each attribute.
+
+*** Accommodation
+The Accommodation attribute defines the quality of the holiday
+accommodation. The possible values are either a holiday flat, or a one
+to five star hotel. To simplify things, a holiday flat is interpreted
+as a 'zero-star' hotel. This means that matching can be done on the
+number of stars (i.e. it turns into a linear match in the range 0-5).
+Under the assumption that, all other things being equal, a better
+accommodation type would be preferred, a 'more is perfect' metric is
+used for the comparison.
+
+*** HolidayType
+Manual grouping
+*** Price
+Distance - less is perfect
+*** NumberOfPersons
+Only match exact number - adapt others
+*** Region
+Geographical matching based on geopy.
+Combine with type of place?
+*** Transportation
+Conditional comparison, i.e. substitute planes for other modes if the
+journey is sufficiently short?
+*** Duration
+Linear matching + adaptation.
+*** Season
+Match summer/winter/spring/autumn, unless month is adjacent.
+*** Hotel
+If selected, only match on perfect match.
+** Adaptation of results
+Adapt price for number of persons and duration (semi)linearly.
+** Code structure
 The main parts of the application are the Case and Attribute classes
 (and subclasses of the latter). The Case class defines an entire case,
 and how to match it to another case. Each attribute is represented by
@@ -6,35 +79,18 @@ an appropriate Attribute subclass, which defines how to match values for
 this attribute to each other, whether or not to adapt attribute
 values, etc.
 
-* Comparison functions
 The subclasses of the Attribute class define how to match attributes
 to each other. Subclasses are defined for each type of matching (e.g.
 exact matching, less is perfect matching, etc), and for adaptation
 types (e.g. numerical adaptation). Classes are defined for the
 attribute names which inherit the corresponding matching classes,
 setting relevant parameters.
-
-** HolidayType
-Manual grouping
-** Price
-Distance - less is perfect
-** NumberOfPersons
-Only match exact number - adapt others
-** Region
-Geographical matching based on geopy.
-Combine with type of place?
-** Transportation
-Conditional comparison, i.e. substitute planes for other modes if the
-journey is sufficiently short?
-** Duration
-Linear matching + adaptation.
-** Season
-Match summer/winter/spring/autumn, unless month is adjacent.
-** Accommodation
-Linear distance, more is perfect.
-** Hotel
-If selected, only match on perfect match.
-* Adaptation of results
-Adapt price for number of persons and duration (semi)linearly.
-* Interface
+** Interface
 Console (readline-ish) interface.
+
+* Footnotes
+
+[fn:1] No such cases exist in the travel case base, but in principle
+they might.
+
+
