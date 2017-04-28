@@ -54,7 +54,7 @@ class Tree(object):
                 return None
             paths.append(path)
         common_path = []
-        for i in xrange(min([len(p) for p in paths])):
+        for i in range(min([len(p) for p in paths])):
             steps = [p[i] for p in paths]
             value = steps[0]
             for s in steps:
@@ -102,8 +102,8 @@ if __name__ == "__main__":
     tree = Tree(["root", 0.0, [["1", 0.5, [["1.1", 0.75, [["1.1.1", 0.9, []],
                                                           ["1.1.2", 0.92, []]]],
                                            ["1.2", 0.6, [["1.2.1", 0.9, []]]]]]]])
-    print tree
-    print [i.name for i in tree.find_path("1.1.2")]
-    print tree.find_value("1.2.1")
-    print [i.name for i in tree.find_common_path(["1.1.1", "1.1.2"])]
-    print tree.find_common_value(["1.1.1","1.2.1", "1.1.2"])
+    print(tree)
+    print([i.name for i in tree.find_path("1.1.2")])
+    print(tree.find_value("1.2.1"))
+    print([i.name for i in tree.find_common_path(["1.1.1", "1.1.2"])])
+    print(tree.find_common_value(["1.1.1","1.2.1", "1.1.2"]))

@@ -38,7 +38,7 @@ class Case(dict):
     def __init__(self, values={}, **kwargs):
         """Constructor populates the case with the dictionary values
         and/or the kwargs."""
-        for key,value in values.items() + kwargs.items():
+        for key,value in list(values.items()) + list(kwargs.items()):
             self[key] = value
 
     def __setitem__(self, name, value):
@@ -59,7 +59,7 @@ class Case(dict):
             super(Case, self).__setitem__(name,getattr(attribute_names, name)(value))
 
     def __repr__(self):
-        return "<Case: %s>" % (", ".join(map(repr, self.values())))
+        return "<Case: %s>" % (", ".join(map(repr, list(self.values()))))
 
     def similarity(self, other):
         """Compute total similarity between cases. Total similarity is
@@ -68,7 +68,7 @@ class Case(dict):
 
         total_weight = 0.0
         total_similarity = 0.0
-        for attr in self.values():
+        for attr in list(self.values()):
             if attr.matching:
                 try:
                     total_similarity += attr.similarity(other[attr.name])
@@ -94,14 +94,14 @@ class Case(dict):
 
         # First pass: Compute adaptation level from all adaptable
         # attributes that exists in both case objects.
-        for attr in self.values():
+        for attr in list(self.values()):
             if attr.adaptable and attr.name in other:
                 total_adapt *= attr.adapt_distance(other[attr.name])
 
         # Second pass: Copy all attributes into the new object; for
         # adaptable attributes, use the values from other, for
         # adjustable attributes, adjust them by the adapt value
-        for attr in self.values():
+        for attr in list(self.values()):
             if attr.adaptable and attr.name in other:
                 new_case[attr.name] = other[attr.name]
             elif attr.adjustable:

@@ -223,11 +223,11 @@ class Accommodation(attributes.MoreIsPerfect):
     # Dictionaries to turn numbers into words and back. Also
     # specifies the valid values for this attribute.
     _numbers = {0:"Holiday flat",1:"One", 2:"Two", 3:"Three", 4:"Four",5:"Five",}
-    _numbers_rev = dict([(j.lower(), i) for (i,j) in _numbers.items()])
+    _numbers_rev = dict([(j.lower(), i) for (i,j) in list(_numbers.items())])
     # Compile a regular expression to match for numbers at the
     # start of a string, either in numerical or letter form.
     _numbers_match = re.compile("^\s*(?P<number>"+\
-                                ("|".join(map(str,_numbers_rev.keys()+_numbers_rev.values()))+")"), re.I)
+                                ("|".join(map(str,list(_numbers_rev.keys())+list(_numbers_rev.values())))+")"), re.I)
     _weight = 2.0
     _range = [0.0, 5.0]
 

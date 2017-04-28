@@ -21,7 +21,7 @@
 
 import os, atexit
 try:
-    import cPickle as pickle
+    import pickle as pickle
 except ImportError:
     import pickle
 
@@ -46,8 +46,8 @@ location_cache = {}
 if os.path.exists(location_cache_filename):
     with open(location_cache_filename, "rb") as fp:
         try:
-            location_cache = pickle.load(fp)
-        except pickle.UnPicklingError:
+            location_cache = pickle.load(fp, encoding="utf-8")
+        except pickle.UnpicklingError:
                 pass
 
 

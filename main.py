@@ -23,7 +23,7 @@
 import os, sys
 
 try:
-    import cPickle as pickle
+    import pickle as pickle
 except ImportError:
     import pickle
 
@@ -52,11 +52,11 @@ def main():
     if os.path.exists(case_filename):
         with open(case_filename, "rb") as fp:
             ranges,cases = pickle.load(fp)
-            for k,v in ranges.items():
+            for k,v in list(ranges.items()):
                 atrcls = getattr(attribute_names, k)
                 atrcls._range = v
     else:
-        print "Warning: No cases found (looking in '%s')." % case_filename
+        print("Warning: No cases found (looking in '%s')." % case_filename)
         cases = []
     matcher = Matcher(cases)
     interface = Interface(matcher)
@@ -65,6 +65,6 @@ def main():
 if __name__ == "__main__":
     try:
         main()
-    except RuntimeError, e:
+    except RuntimeError as e:
         sys.stderr.write("Fatal error occurred: %s\n" % e)
         sys.exit(1)

@@ -61,7 +61,7 @@ class Interface(Console):
 
     def gen_help(self, method):
         """Generate a help message by removing extra spaces from doc strings"""
-        if isinstance(method, basestring):
+        if isinstance(method, str):
             helpstring = getattr(self.__class__, method).__doc__
         else:
             helpstring = method.__doc__
@@ -71,32 +71,32 @@ class Interface(Console):
         if arg in ('status', 'query', 'result', 'config', 'exit'):
             Console.do_help(self, arg)
         else:
-            print "\n".join(['These are the accepted commands.',
+            print("\n".join(['These are the accepted commands.',
                              'Type help <command> to get help on a specific command.',
                              '',
                              'status    Show summary of system status.',
                              'query     Manipulate and run query.',
                              'result    Show result of a query.',
                              'config    Set config variables.',
-                             'exit      Exit application.'])
+                             'exit      Exit application.']))
 
     def help_help(self):
-        print self.gen_help("do_help"),
+        print(self.gen_help("do_help"), end=' ')
 
     def do_status(self, arg):
         """Print current status of system (i.e. how many cases loaded etc)."""
-        print "Currently %d cases loaded." % len(self.matcher.cases)
+        print("Currently %d cases loaded." % len(self.matcher.cases))
         if self.query:
-            print "Current query has %d attributes." % len(self.query)
+            print("Current query has %d attributes." % len(self.query))
         else:
-            print "No current query."
+            print("No current query.")
         if self.result:
-            print "Result exists."
+            print("Result exists.")
         else:
-            print "No result exists."
+            print("No result exists.")
 
     def help_status(self):
-        print self.gen_help("do_status")
+        print(self.gen_help("do_status"))
 
     def do_query(self, arg):
         """Manipulate the query.
@@ -116,13 +116,13 @@ class Interface(Console):
             if self.query:
                 print_table([self.query], ["Attribute", "Value"])
             else:
-                print "No current query."
+                print("No current query.")
         elif arg == "reset":
             self.query = Case()
         elif arg.startswith('set'):
             parts = arg.split(None, 2)
             if len(parts) < 3:
-                print "Usage: query set <attribute> <value>."
+                print("Usage: query set <attribute> <value>.")
                 return
             arg,key,val = parts
             try:
@@ -130,15 +130,15 @@ class Interface(Console):
                 if self.config['auto_run']:
                     self.do_query("run")
             except KeyError:
-                print "Invalid attribute name '%s'." % key
-                print "Possible attribute names:"
-                print "\n".join(["  "+i for i in sorted(possible_attributes.keys())])
-            except ValueError, e:
-                print str(e)
+                print("Invalid attribute name '%s'." % key)
+                print("Possible attribute names:")
+                print("\n".join(["  "+i for i in sorted(possible_attributes.keys())]))
+            except ValueError as e:
+                print(str(e))
         elif arg.startswith('unset'):
             parts = arg.split()
             if len(parts) < 2:
-                print "Usage: query unset <attribute>."
+                print("Usage: query unset <attribute>.")
                 return
             arg,key = parts[:2]
             try:
@@ -147,17 +147,17 @@ class Interface(Console):
                 if self.config['auto_run']:
                     self.do_query("run")
             except KeyError:
-                print "Attribute '%s' not found." % key
+                print("Attribute '%s' not found." % key)
                 return
         elif arg.startswith('names'):
             parts = arg.split()
             if len(parts) < 2:
-                print "Possible attributes:"
-                print_table([dict([(k,v._weight) for (k,v) in possible_attributes.items()]),
-                             dict([(k,v._adaptable) for (k,v) in possible_attributes.items()]),
-                             dict([(k,v._adjustable) for (k,v) in possible_attributes.items()]),],
+                print("Possible attributes:")
+                print_table([dict([(k,v._weight) for (k,v) in list(possible_attributes.items())]),
+                             dict([(k,v._adaptable) for (k,v) in list(possible_attributes.items())]),
+                             dict([(k,v._adjustable) for (k,v) in list(possible_attributes.items())]),],
                             ["Attribute name", "Weight", "Adaptable", "Adjusted"])
-                print "\n".join(("Weight is the weight of the attribute for case similarity.",
+                print("\n".join(("Weight is the weight of the attribute for case similarity.",
                                  "",
                                  "Adaptable specifies whether the attribute can be adapted to",
                                  "the query value.",
@@ -165,23 +165,23 @@ class Interface(Console):
                                  "Adjustable specifies whether the attribute is adjusted based",
                                  "on the adaptable ones.",
                                  "",
-                                 "Run 'query names <attribute>' for help on an attribute."))
+                                 "Run 'query names <attribute>' for help on an attribute.")))
 
             else:
                 try:
                     key = key_name(parts[1], possible_attributes)
                     attr = possible_attributes[key]
-                    print "\n".join(("Attribute :  %s" % key,
+                    print("\n".join(("Attribute :  %s" % key,
                                      "Weight    :  %s" % attr._weight,
                                      "Adaptable :  %s" % attr._adaptable,
                                      "Adjusted  :  %s" % attr._adjustable,
-                                     ""))
-                    print self.gen_help(attr)
+                                     "")))
+                    print(self.gen_help(attr))
                 except KeyError:
-                    print "Unrecognised attribute name: %s" % parts[1]
+                    print("Unrecognised attribute name: %s" % parts[1])
         elif arg.startswith('run'):
             if not self.query:
-                print "No query to run."
+                print("No query to run.")
                 return
             result = self.matcher.match(self.query, self.config['retrieve'])
             if result:
@@ -194,19 +194,19 @@ class Interface(Console):
                 if self.config['auto_display']:
                     self.do_result("")
                 elif self.interactive:
-                    print "Query run successfully. Use the 'result' command to view the result."
+                    print("Query run successfully. Use the 'result' command to view the result.")
             else:
-                print "no result."
+                print("no result.")
         else:
-            print "Unrecognised argument. Type 'help query' for help."
+            print("Unrecognised argument. Type 'help query' for help.")
 
     def help_query(self):
-        print self.gen_help("do_query")
+        print(self.gen_help("do_query"))
 
     def complete_query(self, text, line, begidx, endidx):
         return self.completions(text, line, {'set': sorted(possible_attributes.keys()),
                                                    'names': sorted(possible_attributes.keys()),
-                                                   'unset': self.query.keys(),
+                                                   'unset': list(self.query.keys()),
                                                    'show': [],
                                                    'reset': [],
                                                    'run': []})
@@ -238,7 +238,7 @@ class Interface(Console):
         default, the query is re-run whenever it is altered, but this
         can be changed with the 'auto_run' parameter."""
         if not self.result:
-            print "No result."
+            print("No result.")
             return
         query,result = self.result
         header = ["Attribute", "Query"]
@@ -252,7 +252,7 @@ class Interface(Console):
                 header.append("Result %d (sim. %.3f)" % (i+add, sim))
             if self.config['verbose_results']:
                 r = {}
-                for k,v in res.items():
+                for k,v in list(res.items()):
                     if k in query:
                         s = query[k].similarity(v)
                         w = query[k].weight
@@ -266,7 +266,7 @@ class Interface(Console):
         print_table(results,header)
 
     def help_result(self):
-        print self.gen_help("do_result")
+        print(self.gen_help("do_result"))
 
     def do_config(self, args):
         """View or set configuration variables.
@@ -281,16 +281,16 @@ class Interface(Console):
         retrieve:                  How many cases to retrieve when running queries.
         verbose_results:           Show similarities (normalised/weighed) for each attribute."""
         if args in ('', 'show'):
-            print "Current config:"
+            print("Current config:")
             print_table([self.config], ['Key', 'Value'])
         elif args.startswith('set'):
             parts = args.split(None, 2)
             if len(parts) < 3:
-                print "Usage: config set <key> <value>."
+                print("Usage: config set <key> <value>.")
                 return
             key,value = parts[1:3]
             if not key in self.config:
-                print "Unrecognised config key: '%s'" % key
+                print("Unrecognised config key: '%s'" % key)
             try:
                 if type(self.config[key]) in (int, float):
                     self.config[key] = type(self.config[key])(value)
@@ -302,23 +302,23 @@ class Interface(Console):
                     else:
                         raise ValueError
             except ValueError:
-                print "Invalid type for key %s: '%s'" % (key,value)
+                print("Invalid type for key %s: '%s'" % (key,value))
         else:
-            print "Unrecognised argument."
+            print("Unrecognised argument.")
             self.help_config()
 
     def help_config(self):
-        print self.gen_help('do_config')
+        print(self.gen_help('do_config'))
 
     def complete_config(self, text, line, begidx, endidx):
         return self.completions(text, line, {'show': [],
-                                             'set': self.config.keys()})
+                                             'set': list(self.config.keys())})
 
     def completions(self, text, line, completions):
         parts = line.split(None)
         current = []
-        if len(parts) == 1 or (len(parts) == 2 and not parts[1] in completions.keys()):
-            current = completions.keys()
+        if len(parts) == 1 or (len(parts) == 2 and not parts[1] in list(completions.keys())):
+            current = list(completions.keys())
         elif ((len(parts) == 2 and not text) or (len(parts) == 3) and text) and parts[1] in completions:
             current = completions[parts[1]]
         return [i+" " for i in current if i.lower().startswith(text.lower())]
@@ -330,12 +330,12 @@ class Interface(Console):
         return Console.completenames(self, text, line, begidx, endidx)
 
     def default(self, line):
-        print "Invalid command. Type 'help' for a list of commands."
+        print("Invalid command. Type 'help' for a list of commands.")
 
     def postloop(self):
         cmd.Cmd.postloop(self)
         if self.interactive:
-            print "Exiting..."
+            print("Exiting...")
 
 if __name__ == "__main__":
     from matcher import Matcher

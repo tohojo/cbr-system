@@ -8,8 +8,7 @@ See ~design-notes.org~ for further information on application design.
 For more information on CBR see [[http://www.cs.auckland.ac.nz/~ian/CBR/][Ian Watson's page on CBR]].
 
 ** Installation
-The application is tested and written using Python 2.7, but will
-probably work in 2.5 and 2.6 as well. Apart from the standard library,
+The application runs on Python 3. Apart from the standard library,
 the application depends on the [[http://code.google.com/p/geopy/][geopy library]]. See the project website
 for installation details (or just try issuing =sudo easy_install
 geopy=).

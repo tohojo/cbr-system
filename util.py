@@ -21,7 +21,7 @@
 
 def key_name(key, dictionary):
     try:
-        keys = dictionary.keys()
+        keys = list(dictionary.keys())
         idx = [i.lower() for i in keys].index(key.lower())
         return keys[idx]
     except ValueError:

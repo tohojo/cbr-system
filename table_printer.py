@@ -22,7 +22,7 @@
 import re
 
 def longest_value(values):
-    return max(map(len, map(unicode, values)))
+    return max(list(map(len, list(map(str, values)))))
 
 def aligned(value, length, align='left'):
     if align == 'left':
@@ -39,8 +39,8 @@ def print_table(dicts, header=None):
     all_keys = set()
     longest_values = []
     for h,d in zip(header_items[1:], dicts):
-        all_keys.update(d.keys())
-        longest_values.append(longest_value(d.values()+[h]))
+        all_keys.update(list(d.keys()))
+        longest_values.append(longest_value(list(d.values())+[h]))
 
     all_keys = sorted(all_keys)
     longest_key = longest_value(all_keys+[header_items[0]])
@@ -58,22 +58,22 @@ def print_table(dicts, header=None):
         rows.append(row)
 
     spacer = re.sub(r"[^\+]", "-", rows[0].replace("|","+"))
-    print spacer
+    print(spacer)
     if header:
         row = ""
-        for i,h,l in zip(range(len(header)), header, [longest_key]+longest_values):
+        for i,h,l in zip(list(range(len(header))), header, [longest_key]+longest_values):
             if i:
                 align = 'right'
             else:
                 align = 'left'
             row += "| "+aligned(h,l,align)+" "
         row +="|"
-        print row
-        print spacer
+        print(row)
+        print(spacer)
 
     for row in rows:
-        print row
-    print spacer
+        print(row)
+    print(spacer)
 
 if __name__ == "__main__":
     d1 = dict(x=2,y=345)

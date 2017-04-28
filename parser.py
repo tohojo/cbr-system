@@ -22,7 +22,7 @@
 
 import csv, re, pprint, os
 try:
-    import cPickle as pickle
+    import pickle as pickle
 except ImportError:
     import pickle
 
@@ -83,7 +83,7 @@ if __name__ == "__main__":
         import sys
         from place import Place
         if len(sys.argv) < 2:
-            print "Usage: %s <filename>." % sys.argv[0]
+            print("Usage: %s <filename>." % sys.argv[0])
             sys.exit(1)
         else:
             filename = sys.argv[1]
@@ -92,7 +92,7 @@ if __name__ == "__main__":
             items = parse_csv(filename)
         else:
             items = parse_cases(filename)
-        print "Parsed %d items" % len(items)
+        print("Parsed %d items" % len(items))
 
         ranges = {}
 
@@ -104,13 +104,13 @@ if __name__ == "__main__":
         ranges['Duration'] = (min(durations),max(durations))
 
 
-        print "Accommodation:", sorted(list(set([i['Accommodation'] for i in items if 'Accommodation' in i])))
-        print "Transportation:", sorted(list(set([i['Transportation'] for i in items if 'Transportation' in i])))
-        print "HolidayType:", sorted(list(set([i['HolidayType'] for i in items if 'HolidayType' in i])))
+        print("Accommodation:", sorted(list(set([i['Accommodation'] for i in items if 'Accommodation' in i]))))
+        print("Transportation:", sorted(list(set([i['Transportation'] for i in items if 'Transportation' in i]))))
+        print("HolidayType:", sorted(list(set([i['HolidayType'] for i in items if 'HolidayType' in i]))))
         regions = list(set([i['Region'] for i in items if 'Region' in i]))
         regions = [(i, Place(i)) for i in regions]
         pp = pprint.PrettyPrinter(indent=4)
-        print "Region:",
+        print("Region:", end=' ')
         pp.pprint(sorted(regions))
         max_distance = 0.0
         min_distance = 10000.0
@@ -128,27 +128,27 @@ if __name__ == "__main__":
                         max_distance = distance
                         max_regions = [region,other_region]
         ranges['Region'] = (min_distance, max_distance, max_direct_distance)
-        for k,v in ranges.items():
-            print "%s: %f-%f, %f" % (k, v[0], v[1], v[1]-v[0])
+        for k,v in list(ranges.items()):
+            print("%s: %f-%f, %f" % (k, v[0], v[1], v[1]-v[0]))
 
-        print "Max direct distance: %f km" % ranges['Region'][2]
+        print("Max direct distance: %f km" % ranges['Region'][2])
 
         filename = "cases.pickle"
         if os.path.exists(filename):
-            print "Case storage file %s exists. Not creating cases." % filename
+            print("Case storage file %s exists. Not creating cases." % filename)
         else:
-            print "Creating and storing Case objects in %s:" % filename
+            print("Creating and storing Case objects in %s:" % filename)
             from case import Case
             cases = []
             for i,item in enumerate(items):
                 cases.append(Case(item))
                 if (i+1)%100 == 0:
-                    print "  %d cases created..." % (i+1)
-            print "  Storing cases...",
+                    print("  %d cases created..." % (i+1))
+            print("  Storing cases...", end=' ')
             with open(filename, "wb") as fp:
                 pickle.dump((ranges,cases), fp, -1)
-                print "done."
-    except RuntimeError, e:
+                print("done.")
+    except RuntimeError as e:
         sys.stderr.write("Fatal error occurred: %s\n" % e)
         sys.exit(1)
 

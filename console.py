@@ -34,7 +34,7 @@ class Console(cmd.Cmd):
     ## Command definitions ##
     def do_hist(self, args):
         """Print a list of commands that have been entered"""
-        print self._hist
+        print(self._hist)
 
     def do_exit(self, args):
         """Exits from the console"""
@@ -72,7 +72,7 @@ class Console(cmd.Cmd):
            Despite the claims in the Cmd documentaion, Cmd.postloop() is not a stub.
         """
         cmd.Cmd.postloop(self)   ## Clean up command completion
-        print "Exiting..."
+        print("Exiting...")
 
     def precmd(self, line):
         """ This method is called after the line has been input but before
@@ -97,9 +97,9 @@ class Console(cmd.Cmd):
            In that case we execute the line as Python code.
         """
         try:
-            exec(line) in self._locals, self._globals
-        except Exception, e:
-            print e.__class__, ":", e
+            exec((line), self._locals, self._globals)
+        except Exception as e:
+            print(e.__class__, ":", e)
 
 if __name__ == '__main__':
         console = Console()

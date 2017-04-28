@@ -24,8 +24,7 @@ from abc import ABCMeta, abstractmethod, abstractproperty
 from tree import Tree
 from util import key_name
 
-class BaseAttribute(object):
-    __metaclass__ = ABCMeta
+class BaseAttribute(object, metaclass=ABCMeta):
     """Base class that Attribute inherits from. Specifies the
     interface that Attribute classes must conform to. Attribute
     contains default implementations of all interface methods."""
