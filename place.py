@@ -30,7 +30,10 @@ try:
 except ImportError:
     raise RuntimeError("Could not find geopy library. See http://code.google.com/p/geopy/.")
 
-geocoder = geocoders.Google(domain="maps.google.co.uk")
+try:
+    geocoder = geocoders.Google(domain="maps.google.co.uk")
+except AttributeError:
+    geocoder = geocoders.GoogleV3(domain="maps.google.co.uk")
 location_cache_filename = "location_cache.pickle"
 
 
